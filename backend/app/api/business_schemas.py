@@ -38,6 +38,7 @@ class ProjectListQuery(PaginationQuery):
     status: ProjectStatus | None = None
     customer_id: int | None = Field(default=None, gt=0)
     property_id: int | None = Field(default=None, gt=0)
+    assignee_id: int | None = Field(default=None, gt=0)
     period_from: date | None = None
     period_to: date | None = None
     sort: Literal["code", "name", "start_date", "end_date", "created_at", "updated_at"] = (
@@ -220,6 +221,7 @@ class ProjectCreate(BusinessRequest):
 
 
 class ProjectUpdate(BusinessRequest):
+    expected_version: int = Field(ge=1)
     code: str | None = Field(default=None, min_length=1, max_length=30)
     name: str | None = Field(default=None, min_length=1, max_length=150)
     description: str | None = None
@@ -227,7 +229,6 @@ class ProjectUpdate(BusinessRequest):
     property_id: int | None = None
     start_date: date | None = None
     end_date: date | None = None
-    is_archived: bool | None = None
 
     @field_validator("code", "name")
     @classmethod
@@ -253,7 +254,61 @@ class ProjectResponse(ProjectCreate):
     is_archived: bool
     created_at: datetime
     updated_at: datetime
+    assignees: list["AssigneeResponse"] = Field(default_factory=list)
 
 
 class ProjectListResponse(PageResponse):
     items: list[ProjectResponse]
+
+
+class AssigneeResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    display_name: str
+    is_active: bool
+
+
+class AssigneeCreate(BusinessRequest):
+    user_id: int = Field(gt=0)
+    display_name: str = Field(min_length=1, max_length=200)
+
+
+class AssigneeUpdate(BusinessRequest):
+    display_name: str | None = Field(default=None, min_length=1, max_length=200)
+    is_active: bool | None = None
+
+
+class AssigneeListResponse(BaseModel):
+    items: list[AssigneeResponse]
+
+
+class AssigneeSetUpdate(BusinessRequest):
+    expected_version: int = Field(ge=1)
+    assignee_ids: list[int]
+
+
+class StatusTransitionRequest(BusinessRequest):
+    expected_version: int = Field(ge=1)
+    status: ProjectStatus
+
+
+class ArchiveProjectRequest(BusinessRequest):
+    expected_version: int = Field(ge=1)
+
+
+class AuditLogResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    project_id: int
+    actor_user_id: int
+    action: str
+    before_values: dict[str, object]
+    after_values: dict[str, object]
+    project_version: int
+    occurred_at: datetime
+
+
+class AuditLogListResponse(BaseModel):
+    items: list[AuditLogResponse]

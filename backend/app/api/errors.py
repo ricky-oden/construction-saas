@@ -83,7 +83,11 @@ async def database_exception_handler(request: Request, exception: SQLAlchemyErro
 async def api_exception_handler(_request: Request, exception: ApiException) -> JSONResponse:
     return _response(
         exception.status_code,
-        ApiErrorBody(code=exception.code, message=exception.message),
+        ApiErrorBody(
+            code=exception.code,
+            message=exception.message,
+            conflict=exception.conflict,
+        ),
     )
 
 
