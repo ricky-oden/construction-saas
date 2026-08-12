@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.api.exceptions import ApiException
 from app.api.schemas import ApiErrorBody, ApiErrorResponse, ApiFieldError
 
 logger = logging.getLogger(__name__)
@@ -79,8 +80,16 @@ async def database_exception_handler(request: Request, exception: SQLAlchemyErro
     )
 
 
+async def api_exception_handler(_request: Request, exception: ApiException) -> JSONResponse:
+    return _response(
+        exception.status_code,
+        ApiErrorBody(code=exception.code, message=exception.message),
+    )
+
+
 def register_exception_handlers(application: FastAPI) -> None:
     application.add_exception_handler(RequestValidationError, validation_exception_handler)
     application.add_exception_handler(StarletteHTTPException, http_exception_handler)
+    application.add_exception_handler(ApiException, api_exception_handler)
     application.add_exception_handler(SQLAlchemyError, database_exception_handler)
     application.add_exception_handler(Exception, unexpected_exception_handler)
