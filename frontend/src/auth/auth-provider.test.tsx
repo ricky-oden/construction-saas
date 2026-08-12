@@ -1,5 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 
 import { AuthProvider, useAuth } from "@/auth/auth-provider";
@@ -44,6 +46,49 @@ it("restores the authenticated user from a stored token", async () => {
   expect(screen.getByText("loading")).toBeInTheDocument();
   expect(await screen.findByText("admin@example.com")).toBeInTheDocument();
   expect(screen.getByText("authenticated")).toBeInTheDocument();
+});
+
+it("uses the same loading tree for server render and first client hydration", async () => {
+  window.localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, "stored-token");
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse(200, user)));
+  const serverHtml = renderToString(
+    <AuthProvider>
+      <AuthHarness />
+    </AuthProvider>,
+  );
+  expect(serverHtml).toContain("loading");
+  const container = document.createElement("div");
+  container.innerHTML = serverHtml;
+  document.body.append(container);
+  const consoleError = vi
+    .spyOn(console, "error")
+    .mockImplementation(() => undefined);
+
+  const root = hydrateRoot(
+    container,
+    <AuthProvider>
+      <AuthHarness />
+    </AuthProvider>,
+  );
+  await waitFor(() => expect(container).toHaveTextContent("authenticated"));
+  expect(
+    consoleError.mock.calls.some(([message]) =>
+      String(message).includes("Hydration failed"),
+    ),
+  ).toBe(false);
+  root.unmount();
+  container.remove();
+  consoleError.mockRestore();
+});
+
+it("finishes restoration as unauthenticated when no token exists", async () => {
+  render(
+    <AuthProvider>
+      <AuthHarness />
+    </AuthProvider>,
+  );
+  expect(screen.getByText("loading")).toBeInTheDocument();
+  expect(await screen.findByText("unauthenticated")).toBeInTheDocument();
 });
 
 it("revokes through the API and clears local authentication on logout", async () => {

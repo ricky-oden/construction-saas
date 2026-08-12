@@ -32,9 +32,9 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [status, setStatus] = useState<AuthStatus>(() =>
-    getStoredToken() ? "loading" : "unauthenticated",
-  );
+  // Server and browser must render the same initial tree. Browser-only token
+  // discovery starts after mount so protected content cannot flash early.
+  const [status, setStatus] = useState<AuthStatus>("loading");
 
   useEffect(() => {
     const handleCleared = () => {
@@ -46,7 +46,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   }, []);
 
   useEffect(() => {
-    if (!getStoredToken()) return;
+    if (!getStoredToken()) {
+      const restoration = window.setTimeout(() => {
+        setUser(null);
+        setStatus("unauthenticated");
+      }, 0);
+      return () => window.clearTimeout(restoration);
+    }
     let active = true;
     apiRequest<AuthUser>("/auth/me")
       .then((restoredUser) => {
