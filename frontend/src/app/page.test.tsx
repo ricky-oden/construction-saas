@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import HomePage from "./page";
 
 describe("HomePage", () => {
-  it("shows the Phase 1 top page", () => {
+  it("shows the current foundation top page", () => {
     render(<HomePage />);
 
     expect(
