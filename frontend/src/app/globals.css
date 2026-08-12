@@ -1,0 +1,183 @@
+:root {
+  color-scheme: light;
+  --background: #f3f6f4;
+  --surface: #ffffff;
+  --text: #17231d;
+  --muted: #57645d;
+  --brand: #155f45;
+  --brand-strong: #0d4633;
+  --border: #cbd5cf;
+  --danger: #a12727;
+  --radius: 0.75rem;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--background);
+  line-height: 1.6;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a,
+button,
+input {
+  outline-offset: 0.2rem;
+}
+
+:focus-visible {
+  outline: 0.2rem solid #1f78d1;
+}
+
+.app-header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.app-header__inner,
+.app-content {
+  width: min(100% - 2rem, 70rem);
+  margin-inline: auto;
+}
+
+.app-header__inner {
+  display: flex;
+  align-items: center;
+  min-height: 4rem;
+}
+
+.brand {
+  color: var(--brand-strong);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.app-content {
+  padding-block: 2rem 4rem;
+}
+
+.page-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.hero,
+.panel,
+.not-found {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.hero h1,
+.panel h2,
+.not-found h1 {
+  margin-top: 0;
+  line-height: 1.25;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--brand);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.state-message {
+  min-height: 5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: var(--muted);
+}
+
+.state-message--error,
+.field-error {
+  color: var(--danger);
+}
+
+.button {
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.65rem 1rem;
+  color: #ffffff;
+  background: var(--brand);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button:disabled {
+  color: #525c56;
+  background: #d8dfdb;
+  cursor: not-allowed;
+}
+
+.form-stack {
+  display: grid;
+  gap: 1rem;
+  max-width: 32rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field input {
+  min-height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding-inline: 0.75rem;
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.form-success {
+  margin: 0;
+  color: var(--brand-strong);
+}
+
+.text-link {
+  color: var(--brand-strong);
+  font-weight: 700;
+}
+
+@media (max-width: 44rem) {
+  .state-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-content {
+    padding-block-start: 1rem;
+  }
+}
