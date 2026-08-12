@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.api.business_schemas import (
@@ -8,7 +8,9 @@ from app.api.business_schemas import (
     CustomerListResponse,
     CustomerResponse,
     CustomerUpdate,
+    PaginationQuery,
     ProjectCreate,
+    ProjectListQuery,
     ProjectListResponse,
     ProjectResponse,
     ProjectUpdate,
@@ -27,8 +29,13 @@ router = APIRouter(dependencies=[management_dependency])
 
 
 @router.get("/customers", response_model=CustomerListResponse)
-def customer_list(session: Annotated[Session, Depends(get_db)]) -> CustomerListResponse:
-    return CustomerListResponse(items=business.list_customers(session))
+def customer_list(
+    query: Annotated[PaginationQuery, Query()],
+    session: Annotated[Session, Depends(get_db)],
+) -> CustomerListResponse:
+    return CustomerListResponse.model_validate(
+        business.list_customers(session, query), from_attributes=True
+    )
 
 
 @router.post("/customers", response_model=CustomerResponse, status_code=201)
@@ -55,8 +62,13 @@ def customer_update(
 
 
 @router.get("/properties", response_model=PropertyListResponse)
-def property_list(session: Annotated[Session, Depends(get_db)]) -> PropertyListResponse:
-    return PropertyListResponse(items=business.list_properties(session))
+def property_list(
+    query: Annotated[PaginationQuery, Query()],
+    session: Annotated[Session, Depends(get_db)],
+) -> PropertyListResponse:
+    return PropertyListResponse.model_validate(
+        business.list_properties(session, query), from_attributes=True
+    )
 
 
 @router.post("/properties", response_model=PropertyResponse, status_code=201)
@@ -83,8 +95,13 @@ def property_update(
 
 
 @router.get("/projects", response_model=ProjectListResponse)
-def project_list(session: Annotated[Session, Depends(get_db)]) -> ProjectListResponse:
-    return ProjectListResponse(items=business.list_projects(session))
+def project_list(
+    query: Annotated[ProjectListQuery, Query()],
+    session: Annotated[Session, Depends(get_db)],
+) -> ProjectListResponse:
+    return ProjectListResponse.model_validate(
+        business.list_projects(session, query), from_attributes=True
+    )
 
 
 @router.post("/projects", response_model=ProjectResponse, status_code=201)

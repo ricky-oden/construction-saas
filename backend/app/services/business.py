@@ -1,20 +1,32 @@
+from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import Select, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.business_schemas import (
     CustomerCreate,
     CustomerUpdate,
+    PaginationQuery,
     ProjectCreate,
+    ProjectListQuery,
     ProjectUpdate,
     PropertyCreate,
     PropertyUpdate,
 )
 from app.api.exceptions import ApiException
 from app.models.business import Customer, Project, Property
+
+
+@dataclass(frozen=True)
+class Page[ModelT]:
+    items: list[ModelT]
+    page: int
+    page_size: int
+    total: int
+    total_pages: int
 
 
 def _not_found(resource: str) -> ApiException:
@@ -40,10 +52,23 @@ def _set_fields(target: Any, values: dict[str, Any]) -> None:
         setattr(target, field, value)
 
 
-def list_customers(session: Session) -> list[Customer]:
-    return list(
-        session.scalars(select(Customer).where(Customer.is_active.is_(True)).order_by(Customer.id))
+def _paginate(session: Session, statement: Select[Any], query: PaginationQuery) -> Page[Any]:
+    total_statement = select(func.count()).select_from(statement.order_by(None).subquery())
+    total = session.scalar(total_statement) or 0
+    items = list(
+        session.scalars(statement.offset((query.page - 1) * query.page_size).limit(query.page_size))
     )
+    total_pages = (total + query.page_size - 1) // query.page_size
+    return Page(items, query.page, query.page_size, total, total_pages)
+
+
+def list_customers(session: Session, query: PaginationQuery) -> Page[Customer]:
+    statement = (
+        select(Customer)
+        .where(Customer.is_active.is_(True))
+        .order_by(Customer.updated_at.desc(), Customer.id.desc())
+    )
+    return _paginate(session, statement, query)
 
 
 def get_customer(session: Session, customer_id: int) -> Customer:
@@ -77,10 +102,13 @@ def update_customer(session: Session, customer_id: int, payload: CustomerUpdate)
     return customer
 
 
-def list_properties(session: Session) -> list[Property]:
-    return list(
-        session.scalars(select(Property).where(Property.is_active.is_(True)).order_by(Property.id))
+def list_properties(session: Session, query: PaginationQuery) -> Page[Property]:
+    statement = (
+        select(Property)
+        .where(Property.is_active.is_(True))
+        .order_by(Property.updated_at.desc(), Property.id.desc())
     )
+    return _paginate(session, statement, query)
 
 
 def get_property(session: Session, property_id: int) -> Property:
@@ -109,10 +137,35 @@ def update_property(session: Session, property_id: int, payload: PropertyUpdate)
     return property_record
 
 
-def list_projects(session: Session) -> list[Project]:
-    return list(
-        session.scalars(select(Project).where(Project.is_archived.is_(False)).order_by(Project.id))
-    )
+PROJECT_SORT_COLUMNS = {
+    "code": Project.code,
+    "name": Project.name,
+    "start_date": Project.start_date,
+    "end_date": Project.end_date,
+    "created_at": Project.created_at,
+    "updated_at": Project.updated_at,
+}
+
+
+def list_projects(session: Session, query: ProjectListQuery) -> Page[Project]:
+    statement = select(Project).where(Project.is_archived.is_(False))
+    if query.name is not None:
+        statement = statement.where(Project.name.icontains(query.name, autoescape=True))
+    if query.status is not None:
+        statement = statement.where(Project.status == query.status)
+    if query.customer_id is not None:
+        statement = statement.where(Project.customer_id == query.customer_id)
+    if query.property_id is not None:
+        statement = statement.where(Project.property_id == query.property_id)
+    if query.period_to is not None:
+        statement = statement.where(Project.start_date <= query.period_to)
+    if query.period_from is not None:
+        statement = statement.where(Project.end_date >= query.period_from)
+
+    sort_column = PROJECT_SORT_COLUMNS[query.sort]
+    direction = sort_column.asc if query.order == "asc" else sort_column.desc
+    id_direction = Project.id.asc if query.order == "asc" else Project.id.desc
+    return _paginate(session, statement.order_by(direction(), id_direction()), query)
 
 
 def get_project(session: Session, project_id: int) -> Project:
