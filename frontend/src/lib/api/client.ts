@@ -1,7 +1,6 @@
 import { ApiClientError, type ApiErrorResponse } from "@/lib/api/errors";
 
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8002/api/v1";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api/v1";
 
 export async function apiRequest<T>(
   path: string,
