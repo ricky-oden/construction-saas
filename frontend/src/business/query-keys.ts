@@ -41,4 +41,8 @@ export const businessKeys = {
     range: (periodFrom: string, periodTo: string) =>
       [...businessKeys.gantt.all, { periodFrom, periodTo }] as const,
   },
+  kanban: {
+    all: ["kanban"] as const,
+    board: () => [...businessKeys.kanban.all, "board"] as const,
+  },
 };

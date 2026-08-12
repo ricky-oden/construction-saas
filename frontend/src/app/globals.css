@@ -395,6 +395,78 @@ input {
   text-overflow: ellipsis;
 }
 
+.kanban-scroll {
+  overflow-x: auto;
+  padding-block-end: 0.5rem;
+}
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(17rem, 1fr));
+  gap: 1rem;
+  min-width: 107rem;
+  align-items: start;
+}
+
+.kanban-column {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #e6eee9;
+}
+
+.kanban-column h2,
+.kanban-column p {
+  margin: 0;
+}
+
+.kanban-column__cards,
+.kanban-card,
+.kanban-card__actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.kanban-card {
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  background: var(--surface);
+}
+
+.kanban-card__title {
+  color: var(--brand-strong);
+  font-weight: 800;
+}
+
+.kanban-card__facts {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.kanban-card__facts div {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: 0.5rem;
+}
+
+.kanban-card__facts dt {
+  color: var(--muted);
+}
+
+.kanban-card__facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.kanban-column__empty {
+  color: var(--muted);
+}
+
 @media (max-width: 44rem) {
   .state-grid {
     grid-template-columns: 1fr;

@@ -6,24 +6,10 @@ import { useState } from "react";
 import { useAuth } from "@/auth/auth-provider";
 import { businessApi, writeBusiness } from "@/business/api";
 import { businessKeys } from "@/business/query-keys";
-import type { Project, ProjectStatus } from "@/business/types";
+import type { Project } from "@/business/types";
 import { Button } from "@/components/ui/button";
 import { ApiClientError } from "@/lib/api/errors";
-
-const transitions: Record<ProjectStatus, ProjectStatus[]> = {
-  DRAFT: ["PLANNED", "CANCELLED"],
-  PLANNED: ["IN_PROGRESS", "ON_HOLD", "CANCELLED"],
-  IN_PROGRESS: ["ON_HOLD", "COMPLETED", "CANCELLED"],
-  ON_HOLD: ["IN_PROGRESS", "CANCELLED"],
-  COMPLETED: [],
-  CANCELLED: [],
-};
-const memberTransitions = new Set([
-  "PLANNED:IN_PROGRESS",
-  "IN_PROGRESS:ON_HOLD",
-  "ON_HOLD:IN_PROGRESS",
-  "IN_PROGRESS:COMPLETED",
-]);
+import { allowedStatusTargets } from "@/kanban/transitions";
 
 function workflowError(error: unknown) {
   if (error instanceof ApiClientError && error.status === 409) {
@@ -76,9 +62,9 @@ export function ProjectWorkflow({ project }: Readonly<{ project: Project }>) {
       setError(workflowError(caught));
     }
   };
-  const allowedTargets = transitions[project.status].filter(
-    (target) =>
-      management || memberTransitions.has(`${project.status}:${target}`),
+  const allowedTargets = allowedStatusTargets(
+    project.status,
+    user?.role ?? "MEMBER",
   );
 
   return (

@@ -8,7 +8,7 @@ import type {
   ProjectSearchParams,
   Property,
 } from "@/business/types";
-import { apiRequest } from "@/lib/api/client";
+import { apiRequest, type ApiRequestOptions } from "@/lib/api/client";
 
 function listPath(path: string, params: object) {
   const query = new URLSearchParams();
@@ -54,16 +54,40 @@ export const businessApi = {
     } while (page <= totalPages);
     return items;
   },
+  kanbanProjects: async () => {
+    const items: Project[] = [];
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const response = await apiRequest<ListResponse<Project>>(
+        listPath("/projects", {
+          sort: "start_date",
+          order: "asc",
+          page,
+          page_size: 100,
+        }),
+      );
+      items.push(...response.items);
+      totalPages = response.total_pages;
+      page += 1;
+    } while (page <= totalPages);
+    return items;
+  },
 };
 
 export function writeBusiness<T>(
   path: string,
   method: "POST" | "PATCH" | "PUT",
   body: unknown,
+  options?: ApiRequestOptions,
 ) {
-  return apiRequest<T>(path, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  return apiRequest<T>(
+    path,
+    {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+    options,
+  );
 }

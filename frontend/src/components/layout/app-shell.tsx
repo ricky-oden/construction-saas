@@ -12,6 +12,7 @@ export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
           <nav className="app-navigation" aria-label="主要画面">
             <Link href="/projects">案件</Link>
             <Link href="/schedule">ガント</Link>
+            <Link href="/kanban">カンバン</Link>
           </nav>
         </div>
       </header>
