@@ -30,6 +30,8 @@ export const businessKeys = {
   assignees: {
     all: ["assignees"] as const,
     list: () => [...businessKeys.assignees.all, "list"] as const,
+    detail: (id: number) =>
+      [...businessKeys.assignees.all, "detail", id] as const,
   },
   history: {
     all: ["project-history"] as const,
