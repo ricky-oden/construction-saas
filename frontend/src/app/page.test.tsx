@@ -10,6 +10,6 @@ describe("HomePage", () => {
     expect(
       screen.getByRole("heading", { name: "建設業向け案件管理SaaS" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/業務機能は後続Phase/)).toBeInTheDocument();
+    expect(screen.getByText(/顧客・物件・案件/)).toBeInTheDocument();
   });
 });
