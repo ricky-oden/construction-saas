@@ -6,10 +6,10 @@ export default function HomePage() {
   return (
     <main className="page-stack">
       <section className="hero" aria-labelledby="page-title">
-        <p className="eyebrow">CONSTRUCTION-V1 · Phase 3</p>
+        <p className="eyebrow">CONSTRUCTION-V1 · Phase 4</p>
         <h1 id="page-title">建設業向け案件管理SaaS</h1>
         <p>
-          frontendとbackendの責務を追跡するための学習用基盤です。認証基盤まで実装し、業務機能は後続Phaseで実装します。
+          frontendとbackendの責務を追跡するための学習用基盤です。顧客・物件・案件の基本管理まで実装しています。
         </p>
       </section>
 
