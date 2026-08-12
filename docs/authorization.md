@@ -47,6 +47,8 @@ The backend is authoritative. Frontend route guards and hidden/disabled controls
 
 Phase 3 provides `require_roles(...)` for endpoint-level role checks. Missing/invalid authentication returns `AUTHENTICATION_REQUIRED` with 401; an authenticated user lacking the required role receives `FORBIDDEN` with 403. Assignment, resource, project status, and version checks remain unimplemented until their approved phases.
 
+Phase 4 applies the ADMIN/MANAGER dependency to every Customer, Property, and Project management endpoint. MEMBER receives 403 even through a direct API request. MEMBER assigned-project visibility is intentionally absent until project assignment is implemented in Phase 6.
+
 ## Status service boundary
 
 All project status changes call a dedicated service that receives actor, project, target status, and expected version. It verifies authorization, the approved transition matrix, and version before updating status and writing AUDIT-001 in one transaction.

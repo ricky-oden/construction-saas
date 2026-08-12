@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirement: TEST-001
 
-Status: `PARTIAL` — Phase 1–3 foundation coverage implemented; later business and browser coverage remains.
+Status: `PARTIAL` — Phase 1–4 foundation and core vertical-slice coverage implemented; later search, concurrency, audit, and browser coverage remains.
 
 ## Principles
 
@@ -27,6 +27,8 @@ Phase 1 verified in jsdom:
 These are component tests; they do not launch a real browser or exercise a live backend.
 
 Phase 3 jsdom tests add token storage/restoration, Bearer attachment, 401 clearing, protected-route origin retention, role-gated display, login input retention, pending disabled text, validation, successful token storage, and logout.
+
+Phase 4 jsdom tests add Customer list loading/error/empty states, management-role gating, retained form input after API failure, pending disabled text, and project date-range validation. These tests mock API calls and do not launch a browser.
 
 Later phases add:
 
@@ -66,11 +68,21 @@ Phase 3 additionally verifies:
 - migration upgrade/current/check and idempotent demo seed
 - real Next.js proxy login→me→logout over container TCP
 
+Phase 4 additionally verifies with real PostgreSQL:
+
+- Customer, Property, and Project list/create/detail/update APIs
+- customer/property mismatch and inactive-reference rejection
+- preservation of unchanged inactive references on existing projects
+- duplicate Customer/Project codes and reversed dates
+- ADMIN/MANAGER access, MEMBER 403, and unauthenticated 401
+- PostgreSQL unique, composite foreign-key, and date constraints
+- migration downgrade/upgrade/current/check
+- real Next.js proxy login and Customer→Property→Project flow over container TCP
+
 Later phases add:
 
 - assigned-project and resource authorization
-- Customer/property/project cardinality and consistency
-- Customer, property, assignee, and project CRUD/archive behavior
+- Assignee and project-assignment behavior
 - Project search combinations, sorting, and pagination
 - Multiple assignee uniqueness and replacement
 - Status transition service against the approved matrix
@@ -129,4 +141,4 @@ GitHub Actions is not part of Phase 2 and no workflow exists. When separately ap
 - Browser matrix
 - Coverage thresholds
 
-Phase 2 migration checks are `alembic upgrade head`, `alembic current`, and `alembic check`. No revision exists until a later phase introduces schema metadata.
+Phase 4 migration checks include downgrade to the Phase 3 revision followed by `alembic upgrade head`, `alembic current`, and `alembic check` against the isolated test database.

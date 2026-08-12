@@ -4,7 +4,7 @@ Project ID: `CONSTRUCTION-V1`
 
 Plan version: `CONSTRUCTION-V1.0`
 
-Implementation status: Phase 3 authentication and authorization foundation implemented and verified
+Implementation status: Phase 4 Customer/Property/Project vertical slice implemented and verified
 
 This repository is a learning implementation of a construction-industry project management SaaS. It is intended to make the work history described in the career material traceable from the browser through the API and ORM to PostgreSQL.
 
@@ -101,7 +101,7 @@ docker compose exec -T \
 
 Tests reject a missing/invalid test URL or a database name that does not end in `_test`; they never fall back to the development DB.
 
-Alembic shares backend settings. Phase 3 adds the authentication-foundation revision:
+Alembic shares backend settings. Phase 3 adds the authentication-foundation revision and Phase 4 adds the Customer/Property/Project business-core revision:
 
 ```bash
 docker compose exec -T backend alembic upgrade head
@@ -111,6 +111,8 @@ docker compose exec -T backend python -m app.db.seed
 ```
 
 The seed command is idempotent and uses the learning-only passwords from `.env`. Demo login IDs are `admin@example.com`, `manager@example.com`, `member@example.com`, and inactive `inactive@example.com`; their example passwords are documented only in `.env.example`. The login UI is at `http://localhost:3000/login`, and `/account` demonstrates protected-route, role-gate, and logout behavior.
+
+ADMIN and MANAGER can use the Phase 4 screens at `/customers`, `/properties`, and `/projects`, including their registration and detail/update routes. MEMBER receives 403 for these general-management APIs and screens; assigned-project access waits for the assignment implementation in Phase 6.
 
 ## Authentication security boundary
 
@@ -127,6 +129,7 @@ frontend/
   src/app/                  Next.js App Router layout, top page, 404, global CSS
   src/components/           app shell, common states/button, minimal form
   src/auth/                 token storage, AuthProvider, guards and roles
+  src/business/             Customer/Property/Project API types and client
   src/lib/api/              API client and shared error types
   src/providers/            TanStack Query provider
 backend/
@@ -134,9 +137,10 @@ backend/
   app/core/                 settings
   app/db/                   lazy SQLAlchemy engine/session and test DB guard
   app/auth/                 password/token service and authorization dependencies
-  app/models/               User, AuthTokenSession, and Assignee
-  alembic/                  Phase 3 authentication schema revision
-  tests/                    health, errors, DB safety, authentication, roles, seed
+  app/models/               Auth plus Customer, Property, and Project models
+  app/services/             Phase 4 reference/date/code validation and CRUD
+  alembic/                  Phase 3 auth and Phase 4 business-core revisions
+  tests/                    infrastructure, auth, roles, CRUD, constraints, seed
 ```
 
 ## Documentation
@@ -153,4 +157,4 @@ Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanb
 
 ## Current boundary
 
-Phase 3 contains authentication and authorization foundations only. It has no Customer, Property, Project, project assignment, business API, audit history, status service, Gantt, Kanban, GitHub Actions workflow, or production deployment.
+Phase 4 contains Customer, Property, and Project list/create/detail/update only. It has no project assignment, version-conflict handling, status transition service, audit history, search/sort/pagination, Gantt, Kanban, GitHub Actions workflow, or production deployment.

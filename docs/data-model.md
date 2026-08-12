@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-`User`, `AuthTokenSession`, and `Assignee` are implemented in Phase 3. All business models remain planned and `NOT_IMPLEMENTED`.
+`User`, `AuthTokenSession`, and `Assignee` were implemented in Phase 3. `Customer`, `Property`, and `Project` are implemented in Phase 4. Assignment, transition, version-conflict, and audit models remain later-phase work.
 
 ## Relationship overview
 
@@ -18,7 +18,7 @@ Project 1 --- * AuditLog
 
 One project has exactly one customer and one property. A project cannot span multiple properties. The selected property must belong to the selected customer, enforced by backend domain validation and supported by database constraints where practical.
 
-## Planned entities
+## Entities
 
 ### User — implemented
 
@@ -47,34 +47,44 @@ A PostgreSQL partial unique index permits at most one unrevoked session per user
 - active/archive state
 - created/updated timestamps
 
-### Customer
+### Customer — implemented
 
 - `id`
-- customer code/name and business fields to be finalized
-- active/archive state
+- unique `code` (maximum 30 characters)
+- `name` (maximum 100 characters)
+- optional `contact_name` (maximum 100 characters)
+- optional `phone` (maximum 30 characters)
+- optional email-formatted `email`
+- `is_active`
 - created/updated timestamps
 
-### Property
+### Property — implemented
 
 - `id`
 - `customer_id`
-- property name/address and business fields to be finalized
-- active/archive state
+- `name` (maximum 100 characters)
+- optional `postal_code` (maximum 10 characters)
+- `prefecture` (maximum 20 characters)
+- `city` (maximum 100 characters)
+- `address_line` (maximum 200 characters)
+- `is_active`
 - created/updated timestamps
 
-### Project
+### Project — implemented
 
 - `id`
-- project name and business fields to be finalized
+- unique `code` (maximum 30 characters)
+- `name` (maximum 150 characters)
+- optional `description`
 - `customer_id`
 - `property_id`
-- `status`: one of the six approved values
-- `start_date`, `end_date` as date values
-- integer `version`
-- active/archive state
+- `status`: one of the six approved values; defaults to `DRAFT`
+- required `start_date`, `end_date` date values
+- integer `version`; defaults to `1`
+- `is_archived`; defaults to `false`
 - created/updated timestamps
 
-`start_date <= end_date` is required when both dates are present. Whether both dates are always mandatory is unresolved.
+`start_date <= end_date` is enforced in both application validation and PostgreSQL. A composite foreign key enforces that the selected property belongs to the selected customer. Phase 4 does not expose status transitions or version-conflict behavior.
 
 ### ProjectAssignee
 
@@ -108,7 +118,7 @@ The project/assignee pair is unique. Primary-assignee or assignment-role concept
 
 ## Archive behavior
 
-Major business records are not physically deleted through normal operations. A consistent archive or active-state representation will be chosen during schema implementation. Reactivation rules, archive cascades, and whether referenced records can be archived remain unresolved.
+Phase 4 exposes no physical-delete API. Customers and properties use `is_active`; projects use `is_archived`. Inactive/archived records are excluded from lists but remain available by ID. Inactive customers/properties cannot be selected for a new project or a changed project reference, while an existing project retains and may continue to submit its unchanged historical references. Reactivation and archive-cascade policy remains unresolved.
 
 ## Explicit exclusions
 

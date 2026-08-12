@@ -62,6 +62,18 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-037 | Store the learning token in frontend localStorage, attach it as a Bearer credential, clear it on 401, restore via `/auth/me`, preserve the protected-route path, and document XSS exposure. |
 | DEC-038 | Provide an environment-driven, idempotent four-user demo seed with ADMIN, MANAGER, MEMBER, inactive, and assignee-linked cases. Values in `.env.example` are learning-only. |
 
+## 2026-08-12 — Phase 4 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-039 | Implement the approved Customer, Property, and Project fields with PostgreSQL length/nullability/default constraints and unique indexes for customer/project codes. |
+| DEC-040 | Enforce Project `start_date <= end_date` with both request/service validation and a PostgreSQL check constraint. |
+| DEC-041 | Enforce Property/Customer consistency with service checks and a composite PostgreSQL foreign key from Project to Property `(id, customer_id)`. |
+| DEC-042 | Reject inactive Customer/Property references for new Projects while retaining existing foreign keys and detail access after deactivation. Ordinary updates that do not replace references remain allowed. |
+| DEC-043 | Protect all Phase 4 management endpoints with ADMIN/MANAGER dependencies. MEMBER general management receives 403; assigned-project access remains Phase 6. |
+| DEC-044 | Keep status at creation default `DRAFT` and version at 1. Do not accept status writes, increment version, detect conflicts, assign users, or create audit records in Phase 4. |
+| DEC-045 | Use `is_active` for Customer/Property and `is_archived` for Project, exclude them from default lists, retain detail access, and expose no physical-delete endpoint. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.

@@ -2,28 +2,28 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Current phase: Phase 3 — authentication and authorization foundation implemented and verified; review pending.
+Current phase: Phase 4 — Customer/Property/Project vertical slice implemented and verified; review pending.
 
 ## Product requirement status
 
-Phases 1 and 2 are complete and Phase 3 authentication infrastructure is implemented. Requirements spanning later phases remain partial or not implemented. No Customer/Property/Project model or API, project assignment, audit history, Gantt, Kanban, or CI workflow exists.
+Phases 1–3 are complete and the Phase 4 business-core vertical slice is implemented. Requirements spanning later phases remain partial or not implemented. No project assignment, version conflict, status transition service, audit history, advanced search/cache, Gantt, Kanban, or CI workflow exists.
 
 | Requirement group | Status | Verification |
 |---|---|---|
 | ENV | PARTIAL | Node/Python/PostgreSQL patches, lockfiles, dependency separation, Docker Compose, nonroot runtime, DB separation, and migration checks verified; CI remains Phase 9 |
-| UI | PARTIAL | Shared shell, states, button, and React Hook Form foundation verified; business usage remains later-phase |
-| API | PARTIAL | Common error envelope, DB error handler, DB-backed health, and same-origin proxy verified; business errors and 409 metadata remain later-phase |
-| AUTH | PARTIAL | Login/logout/me, Argon2id, hashed opaque sessions, expiry, inactive-user checks, three roles, backend role dependency, and frontend auth foundation verified; resource authorization remains later-phase |
-| DATA | PARTIAL | SQLAlchemy infrastructure and User/AuthTokenSession/optional Assignee relationship verified; Customer/Property/Project and project assignment are not implemented |
-| PRJ | NOT_IMPLEMENTED | Not run |
+| UI | PARTIAL | Shared states and React Hook Form are used by nine Phase 4 CRUD routes; later search/Gantt/Kanban UI remains |
+| API | PARTIAL | Stable auth/validation/not-found/duplicate/reference/server errors verified; Phase 6 conflict metadata remains |
+| AUTH | PARTIAL | ADMIN/MANAGER business management and direct MEMBER 403 verified; MEMBER assigned-project scope waits for Phase 6 |
+| DATA | PARTIAL | Customer/Property/Project cardinality, date, unique code, and reference constraints verified; project assignment remains unimplemented |
+| PRJ | PARTIAL | Customer, Property, and Project list/create/detail/update verified; assignee management and multiple assignment remain |
 | SEARCH | NOT_IMPLEMENTED | Not run |
 | STATUS | NOT_IMPLEMENTED | Not run |
 | GANTT | NOT_IMPLEMENTED | Not run |
 | KANBAN | NOT_IMPLEMENTED | Not run |
 | CACHE | NOT_IMPLEMENTED | Not run |
 | AUDIT | NOT_IMPLEMENTED | Not run |
-| ARCH | NOT_IMPLEMENTED | Not run |
-| TEST | PARTIAL | 18 frontend jsdom tests and 23 backend PostgreSQL tests passed; real-browser and business suites remain later-phase |
+| ARCH | PARTIAL | is_active/is_archived lifecycle and default-list exclusion verified; final reactivation/reference policy remains unresolved |
+| TEST | PARTIAL | 26 frontend jsdom tests and 39 backend PostgreSQL tests passed; real-browser and later business suites remain |
 
 ## Documentation status
 
@@ -56,9 +56,20 @@ Phases 1 and 2 are complete and Phase 3 authentication infrastructure is impleme
 
 ## Prohibited until explicit follow-up approval
 
-- Customer, Property, Project, project assignment, business APIs, status, audit, Gantt, or Kanban
+- Search/sort/pagination/cache, project assignment, version conflicts, status transitions, audit, Gantt, or Kanban
 - GitHub Actions
-- Phase 3 commit, push, pull request, or deployment
+- Phase 4 commit, push, pull request, or deployment
+
+## Phase 4 verification — 2026-08-12
+
+- Customer, Property, and Project PostgreSQL models/migration and list/create/detail/update APIs passed.
+- Unique customer/project codes, project date order, and property/customer pairing are enforced by PostgreSQL and API/service checks.
+- New projects reject inactive customers/properties and mismatched pairs; existing project details and ordinary non-reference updates retain inactive historical references.
+- Project creation defaults to `DRAFT`, version 1, and not archived. Status mutation and version-conflict behavior remain Phase 6.
+- ADMIN and MANAGER management calls passed; unauthenticated requests return 401 and MEMBER direct API requests return 403.
+- Nine frontend routes provide loading/error/empty, validation, submitting-disabled, and recoverable form behavior.
+- 26 frontend jsdom tests and 39 backend PostgreSQL tests passed. Next.js proxy CRUD and MEMBER 403 passed over container TCP.
+- Phase 4 migration upgrade/downgrade/current/check passed on PostgreSQL 16.14.
 
 ## Phase 3 verification — 2026-08-12
 

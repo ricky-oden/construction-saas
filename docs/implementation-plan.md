@@ -28,8 +28,8 @@ Build a learning-oriented construction project management SaaS that connects UI 
 | 0 | Approve and freeze planning documents | All | Completed |
 | 1 | Scaffold frontend/backend and local quality commands | ENV, UI | Completed |
 | 2 | Docker Compose, PostgreSQL, Alembic, and DB-facing error integration | ENV, API, DATA | Completed |
-| 3 | Learning login, opaque token, users/assignees, authorization base | AUTH | Implemented and verified; review pending |
-| 4 | Customer, property, project list/detail/create/update vertical slice | DATA, PRJ | Not implemented |
+| 3 | Learning login, opaque token, users/assignees, authorization base | AUTH | Completed |
+| 4 | Customer, property, project list/detail/create/update vertical slice | DATA, PRJ | Implemented and verified; review pending |
 | 5 | Search, filtering, sorting, pagination, cache policy | SEARCH, CACHE | Not implemented |
 | 6 | Multiple assignees, status service, optimistic locking, audit history | STATUS, AUDIT | Not implemented |
 | 7 | Project-level monthly/weekly Gantt | GANTT | Not implemented |
@@ -76,7 +76,7 @@ A phase is complete only when its mapped acceptance criteria pass, planned autom
 ## Unresolved before relevant implementation
 
 - Exact status transition matrix and per-status member update permissions
-- Exact domain field catalog and validation limits
+- Remaining post-Phase-4 domain field catalogs and validation limits
 - Archive reactivation rules and referential behavior
 - Default sort, page size, and maximum page size
 - Date-overlap search semantics

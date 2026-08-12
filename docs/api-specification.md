@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-The DB-backed health and Phase 3 authentication endpoints are implemented. All business endpoints remain planned and `NOT_IMPLEMENTED`.
+The DB-backed health, Phase 3 authentication, and Phase 4 Customer/Property/Project management endpoints are implemented. Search, assignment, transition, audit, and other later-phase endpoints remain `NOT_IMPLEMENTED`.
 
 ## Common conventions
 
@@ -10,8 +10,8 @@ The DB-backed health and Phase 3 authentication endpoints are implemented. All b
 - Protected requests: `Authorization: Bearer <opaque-token>`
 - JSON request and response bodies
 - Dates: ISO `YYYY-MM-DD`
-- Optimistically locked writes include expected integer `version`
-- A stale version returns HTTP `409 Conflict`
+- From Phase 6, optimistically locked writes include expected integer `version`
+- From Phase 6, a stale version returns HTTP `409 Conflict`
 - Authentication failure returns 401; authorization failure returns 403
 - Validation returns 422 with a consistent field/non-field error shape
 - Archived/inactive major records are excluded by default
@@ -46,16 +46,18 @@ Authentication failures use HTTP 401 and `AUTHENTICATION_REQUIRED` or `INVALID_C
 
 | Method | Path | Purpose | Requirement |
 |---|---|---|---|
-| GET | `/api/v1/projects` | Search/filter/sort/page visible projects | PRJ-001, SEARCH-001 |
+| GET | `/api/v1/projects` | List non-archived projects | PRJ-001 |
 | POST | `/api/v1/projects` | Register project | PRJ-001, DATA-002 |
 | GET | `/api/v1/projects/{project_id}` | Get authorized project detail | PRJ-001 |
-| PATCH | `/api/v1/projects/{project_id}` | Update project fields with expected version | PRJ-001, STATUS-002, AUDIT-001 |
+| PATCH | `/api/v1/projects/{project_id}` | Update Phase 4 project fields | PRJ-001 |
 | POST | `/api/v1/projects/{project_id}/archive` | Archive project | ARCH-001 |
 | PUT | `/api/v1/projects/{project_id}/assignees` | Replace/update assignment set with expected version | PRJ-004, STATUS-002, AUDIT-001 |
 | POST | `/api/v1/projects/{project_id}/status-transitions` | Request status transition with expected version | STATUS-001, STATUS-002, KANBAN-001 |
 | GET | `/api/v1/projects/{project_id}/history` | Get authorized project audit history | AUDIT-001 |
 
-Planned list query parameters:
+The first four project endpoints are implemented for ADMIN and MANAGER. `PATCH` can update `is_archived`, but cannot write status or version. No DELETE endpoint exists. The archive, assignment, transition, and history endpoints in the table remain planned.
+
+Planned Phase 5 list query parameters:
 
 - `name`
 - `assignee_id`
@@ -80,6 +82,8 @@ Planned list response metadata includes `items`, `page`, `page_size`, and `total
 | PATCH | `/api/v1/customers/{customer_id}` | Update customer | PRJ-002 |
 | POST | `/api/v1/customers/{customer_id}/archive` | Archive customer subject to references | ARCH-001 |
 
+The first four customer endpoints are implemented for ADMIN and MANAGER. `PATCH` can update `is_active`; no DELETE or separate archive endpoint is implemented in Phase 4.
+
 ## Properties
 
 | Method | Path | Purpose | Requirement |
@@ -89,6 +93,8 @@ Planned list response metadata includes `items`, `page`, `page_size`, and `total
 | GET | `/api/v1/properties/{property_id}` | Get property and customer relation | PRJ-003 |
 | PATCH | `/api/v1/properties/{property_id}` | Update property | PRJ-003 |
 | POST | `/api/v1/properties/{property_id}/archive` | Archive property subject to references | ARCH-001 |
+
+The first four property endpoints are implemented for ADMIN and MANAGER. `PATCH` can update `is_active`; no DELETE or separate archive endpoint is implemented in Phase 4. Project creation and reference changes reject inactive or mismatched customer/property combinations.
 
 ## Assignees
 
@@ -104,7 +110,7 @@ Planned list response metadata includes `items`, `page`, `page_size`, and `total
 
 - ADMIN: all in-scope endpoints and operations
 - MANAGER: manage projects, customers, properties, and assignees
-- MEMBER: project read only when assigned; project updates only within the still-to-be-approved field/status range
+- MEMBER: Phase 4 general Customer/Property/Project management endpoints return 403; assigned-project access remains unimplemented until assignment work in Phase 6
 - Backend checks apply even when the frontend hides a route or control
 
 ## Common error body
