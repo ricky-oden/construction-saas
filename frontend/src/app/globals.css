@@ -174,7 +174,19 @@ input {
 .app-header__inner {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   min-height: 4rem;
+}
+
+.app-navigation {
+  display: flex;
+  gap: 1rem;
+}
+
+.app-navigation a {
+  color: var(--brand-strong);
+  font-weight: 700;
 }
 
 .brand {
@@ -285,6 +297,102 @@ input {
 .text-link {
   color: var(--brand-strong);
   font-weight: 700;
+}
+
+.gantt-controls,
+.gantt-mode,
+.gantt-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.gantt-controls {
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.gantt-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.gantt-table {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-width: 100%;
+}
+
+.gantt-row {
+  display: contents;
+}
+
+.gantt-label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  display: grid;
+  align-content: center;
+  min-height: 3.5rem;
+  padding: 0.5rem 0.75rem;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.gantt-header-label {
+  z-index: 3;
+  font-weight: 800;
+  background: #e6eee9;
+}
+
+.gantt-status {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.gantt-timeline {
+  position: relative;
+  display: flex;
+  min-height: 3.5rem;
+}
+
+.gantt-header {
+  background: #e6eee9;
+}
+
+.gantt-date,
+.gantt-cell {
+  flex: 0 0 auto;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.gantt-date {
+  padding: 0.4rem 0.2rem;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.gantt-row-grid {
+  align-items: center;
+}
+
+.gantt-bar {
+  position: absolute;
+  z-index: 1;
+  inset-block: 0.75rem;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  padding-inline: 0.5rem;
+  color: white;
+  background: var(--brand);
+  text-decoration: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 @media (max-width: 44rem) {
