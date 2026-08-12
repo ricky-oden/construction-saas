@@ -11,20 +11,25 @@ const api = vi.hoisted(() => ({
   projects: vi.fn(),
   customers: vi.fn(),
   properties: vi.fn(),
+  assignees: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: navigation.push }),
   useSearchParams: () => new URLSearchParams(navigation.query),
 }));
-vi.mock("@/auth/management-route", () => ({
-  ManagementRoute: ({ children }: { children: ReactNode }) => children,
+vi.mock("@/auth/auth-provider", () => ({
+  useAuth: () => ({ user: { role: "MANAGER" } }),
+}));
+vi.mock("@/auth/protected-route", () => ({
+  ProtectedRoute: ({ children }: { children: ReactNode }) => children,
 }));
 vi.mock("@/business/api", () => ({
   businessApi: {
     projects: (...args: unknown[]) => api.projects(...args),
     customers: (...args: unknown[]) => api.customers(...args),
     properties: (...args: unknown[]) => api.properties(...args),
+    assignees: (...args: unknown[]) => api.assignees(...args),
   },
 }));
 
@@ -80,12 +85,13 @@ beforeEach(() => {
   api.properties
     .mockReset()
     .mockResolvedValue(response([{ id: 2, customer_id: 1, name: "Property" }]));
+  api.assignees.mockReset().mockResolvedValue({ items: [] });
 });
 
 describe("Project list search", () => {
   it("restores initial URL conditions and sends all of them to the API", async () => {
     navigation.query =
-      "name=Central&status=DRAFT&customer_id=1&property_id=2&period_from=2026-01-01&" +
+      "name=Central&status=DRAFT&customer_id=1&property_id=2&assignee_id=4&period_from=2026-01-01&" +
       "period_to=2026-01-31&sort=code&order=asc&page=2&page_size=10";
     renderPage();
     expect(await screen.findByText(/PRJ-001/)).toBeInTheDocument();
@@ -94,6 +100,7 @@ describe("Project list search", () => {
       status: "DRAFT",
       customer_id: 1,
       property_id: 2,
+      assignee_id: 4,
       period_from: "2026-01-01",
       period_to: "2026-01-31",
       sort: "code",

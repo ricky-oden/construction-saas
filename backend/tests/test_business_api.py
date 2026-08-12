@@ -119,10 +119,13 @@ def test_project_crud_defaults_and_keeps_version_for_phase_6(db_session: Session
     assert client.get("/api/v1/projects").json()["items"][0]["code"] == "PRJ-001"
     assert client.get(f"/api/v1/projects/{project['id']}").status_code == 200
 
-    updated = client.patch(f"/api/v1/projects/{project['id']}", json={"name": "Updated Project"})
+    updated = client.patch(
+        f"/api/v1/projects/{project['id']}",
+        json={"name": "Updated Project", "expected_version": 1},
+    )
     assert updated.status_code == 200
     assert updated.json()["name"] == "Updated Project"
-    assert updated.json()["version"] == 1
+    assert updated.json()["version"] == 2
 
 
 def test_project_rejects_mismatched_customer_property(db_session: Session) -> None:
@@ -198,6 +201,7 @@ def test_inactive_references_remain_available_to_existing_project(db_session: Se
     assert detail.json()["property_id"] == property_record["id"]
     update = project_payload(int(customer["id"]), int(property_record["id"]))
     update["description"] = "Historical reference"
+    update["expected_version"] = 1
     assert client.patch(f"/api/v1/projects/{project['id']}", json=update).status_code == 200
 
 
@@ -213,8 +217,8 @@ def test_member_and_unauthenticated_requests_are_rejected(db_session: Session) -
 
     member = authenticated_client(db_session, Role.MEMBER)
     response = member.get("/api/v1/projects")
-    assert response.status_code == 403
-    assert response.json()["error"]["code"] == "FORBIDDEN"
+    assert response.status_code == 200
+    assert response.json()["items"] == []
 
 
 def test_no_physical_delete_or_phase_6_status_api_exists(db_session: Session) -> None:
@@ -311,7 +315,7 @@ def test_archived_and_inactive_records_leave_default_lists(db_session: Session) 
 
     client.patch(f"/api/v1/customers/{customer['id']}", json={"is_active": False})
     client.patch(f"/api/v1/properties/{property_record['id']}", json={"is_active": False})
-    client.patch(f"/api/v1/projects/{project['id']}", json={"is_archived": True})
+    client.post(f"/api/v1/projects/{project['id']}/archive", json={"expected_version": 1})
 
     assert client.get("/api/v1/customers").json()["items"] == []
     assert client.get("/api/v1/properties").json()["items"] == []

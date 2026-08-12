@@ -239,12 +239,12 @@ def test_pagination_limits_and_default_order(db_session: Session) -> None:
     assert codes(default_response)[:2] == ["PRJ-F", "PRJ-E"]
     assert client.get("/api/v1/projects?page=0").status_code == 422
     assert client.get("/api/v1/projects?page_size=101").status_code == 422
-    assert client.get("/api/v1/projects?assignee_id=1").status_code == 422
+    assert client.get("/api/v1/projects?assignee_id=1").status_code == 200
 
 
 def test_search_keeps_phase_4_authorization_boundary(db_session: Session) -> None:
     assert TestClient(create_app()).get("/api/v1/projects?name=Central").status_code == 401
     member = authenticated_client(db_session, Role.MEMBER)
     response = member.get("/api/v1/projects?name=Central")
-    assert response.status_code == 403
-    assert response.json()["error"]["code"] == "FORBIDDEN"
+    assert response.status_code == 200
+    assert response.json()["items"] == []

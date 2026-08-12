@@ -27,7 +27,7 @@ def clean_auth_tables() -> None:
     with get_session_factory()() as session:
         session.execute(
             text(
-                "TRUNCATE TABLE projects, properties, customers, "
+                "TRUNCATE TABLE audit_logs, project_assignees, projects, properties, customers, "
                 "auth_token_sessions, assignees, users RESTART IDENTITY CASCADE"
             )
         )

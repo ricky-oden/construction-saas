@@ -11,7 +11,7 @@ describe("project search parameters", () => {
   it("restores every supported condition from a URL", () => {
     const restored = projectSearchFromUrl(
       new URLSearchParams(
-        "name=Central&status=IN_PROGRESS&customer_id=2&property_id=3&" +
+        "name=Central&status=IN_PROGRESS&customer_id=2&property_id=3&assignee_id=4&" +
           "period_from=2026-01-01&period_to=2026-01-31&sort=start_date&" +
           "order=asc&page=4&page_size=50",
       ),
@@ -21,6 +21,7 @@ describe("project search parameters", () => {
       status: "IN_PROGRESS",
       customer_id: 2,
       property_id: 3,
+      assignee_id: 4,
       period_from: "2026-01-01",
       period_to: "2026-01-31",
       sort: "start_date",
@@ -52,6 +53,7 @@ describe("project search parameters", () => {
       status: "DRAFT",
       customer_id: 1,
       property_id: 2,
+      assignee_id: 4,
       period_from: "2026-01-01",
       period_to: "2026-01-31",
       sort: "code",
@@ -64,6 +66,7 @@ describe("project search parameters", () => {
       status: "DRAFT",
       customer_id: 1,
       property_id: 2,
+      assignee_id: 4,
       period_from: "2026-01-01",
       period_to: "2026-01-31",
       sort: "code",
