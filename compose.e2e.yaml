@@ -1,0 +1,43 @@
+services:
+  backend:
+    environment:
+      DATABASE_URL: postgresql+psycopg://${TEST_POSTGRES_USER}:${TEST_POSTGRES_PASSWORD}@test-db:5432/${TEST_POSTGRES_DB}
+    depends_on: !override
+      test-db:
+        condition: service_healthy
+    ports: !override
+      - "8010:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+      args:
+        BACKEND_INTERNAL_URL: http://backend:8000
+    ports: !override
+      - "3010:3000"
+    volumes: !reset []
+
+  frontend-quality:
+    profiles: ["test"]
+    build:
+      context: ./frontend
+      target: development
+    volumes: []
+
+  e2e:
+    profiles: ["test"]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.e2e
+    environment:
+      E2E_BASE_URL: http://frontend:3000
+      E2E_ADMIN_EMAIL: admin@example.com
+      E2E_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD}
+      E2E_MANAGER_EMAIL: manager@example.com
+      E2E_MANAGER_PASSWORD: ${DEMO_MANAGER_PASSWORD}
+      E2E_MEMBER_EMAIL: member@example.com
+      E2E_MEMBER_PASSWORD: ${DEMO_MEMBER_PASSWORD}
+    depends_on:
+      frontend:
+        condition: service_healthy
