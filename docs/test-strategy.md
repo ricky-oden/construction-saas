@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirement: TEST-001
 
-Status: `PARTIAL` — Phase 1–4 foundation and core vertical-slice coverage implemented; later search, concurrency, audit, and browser coverage remains.
+Status: `PARTIAL` — Phase 1–5 foundation, core vertical slice, and non-assignee search/cache coverage implemented; later assignment, concurrency, audit, and browser coverage remains.
 
 ## Principles
 
@@ -29,6 +29,8 @@ These are component tests; they do not launch a real browser or exercise a live 
 Phase 3 jsdom tests add token storage/restoration, Bearer attachment, 401 clearing, protected-route origin retention, role-gated display, login input retention, pending disabled text, validation, successful token storage, and logout.
 
 Phase 4 jsdom tests add Customer list loading/error/empty states, management-role gating, retained form input after API failure, pending disabled text, and project date-range validation. These tests mock API calls and do not launch a browser.
+
+Phase 5 jsdom tests add URL restoration/normalization, submitted and immediate controls, reset and pagination navigation, all-condition query keys, stale-result suppression, loading/error/empty states, retained conditions on failure, cache invalidation, and bounded retry policy. API calls and Next.js navigation are mocked; no real browser is launched.
 
 Later phases add:
 
@@ -79,11 +81,12 @@ Phase 4 additionally verifies with real PostgreSQL:
 - migration downgrade/upgrade/current/check
 - real Next.js proxy login and Customer→Property→Project flow over container TCP
 
+Phase 5 backend tests cover individual and combined Project filters, case-insensitive name matching, status/customer/property selection, inclusive and one-sided period overlap, reversed periods, every fixed sort and both orders, stable ID ordering, pagination metadata/pages/limits, and 401/403. Customer and Property list pagination uses the same response contract.
+
 Later phases add:
 
 - assigned-project and resource authorization
 - Assignee and project-assignment behavior
-- Project search combinations, sorting, and pagination
 - Multiple assignee uniqueness and replacement
 - Status transition service against the approved matrix
 - Integer-version increment and HTTP 409 conflict

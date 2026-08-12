@@ -2,28 +2,28 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Current phase: Phase 4 — Customer/Property/Project vertical slice implemented and verified; review pending.
+Current phase: Phase 5 — search, pagination, and cache policy implemented and verified; review pending.
 
 ## Product requirement status
 
-Phases 1–3 are complete and the Phase 4 business-core vertical slice is implemented. Requirements spanning later phases remain partial or not implemented. No project assignment, version conflict, status transition service, audit history, advanced search/cache, Gantt, Kanban, or CI workflow exists.
+Phases 1–4 are complete and the Phase 5 non-assignee search/cache slice is implemented. Requirements spanning later phases remain partial or not implemented. No project assignment or assignee search, version conflict, status transition service, audit history, Gantt, Kanban, or CI workflow exists.
 
 | Requirement group | Status | Verification |
 |---|---|---|
 | ENV | PARTIAL | Node/Python/PostgreSQL patches, lockfiles, dependency separation, Docker Compose, nonroot runtime, DB separation, and migration checks verified; CI remains Phase 9 |
-| UI | PARTIAL | Shared states and React Hook Form are used by nine Phase 4 CRUD routes; later search/Gantt/Kanban UI remains |
+| UI | PARTIAL | Shared states/forms plus URL-backed Project search and pagination are implemented; later assignment/Gantt/Kanban UI remains |
 | API | PARTIAL | Stable auth/validation/not-found/duplicate/reference/server errors verified; Phase 6 conflict metadata remains |
 | AUTH | PARTIAL | ADMIN/MANAGER business management and direct MEMBER 403 verified; MEMBER assigned-project scope waits for Phase 6 |
 | DATA | PARTIAL | Customer/Property/Project cardinality, date, unique code, and reference constraints verified; project assignment remains unimplemented |
 | PRJ | PARTIAL | Customer, Property, and Project list/create/detail/update verified; assignee management and multiple assignment remain |
-| SEARCH | NOT_IMPLEMENTED | Not run |
+| SEARCH | PARTIAL | Name/status/customer/property/period filters, fixed sorting, and pagination implemented; assignee search waits for Phase 6 |
 | STATUS | NOT_IMPLEMENTED | Not run |
 | GANTT | NOT_IMPLEMENTED | Not run |
 | KANBAN | NOT_IMPLEMENTED | Not run |
-| CACHE | NOT_IMPLEMENTED | Not run |
+| CACHE | PARTIAL | Feature query-key factory, per-condition Project caches, mutation invalidation/detail updates, and bounded retry implemented; later Gantt/Kanban/history caches do not yet exist |
 | AUDIT | NOT_IMPLEMENTED | Not run |
 | ARCH | PARTIAL | is_active/is_archived lifecycle and default-list exclusion verified; final reactivation/reference policy remains unresolved |
-| TEST | PARTIAL | 26 frontend jsdom tests and 39 backend PostgreSQL tests passed; real-browser and later business suites remain |
+| TEST | PARTIAL | 43 frontend jsdom tests and 68 backend PostgreSQL tests passed; real-browser and later business suites remain |
 
 ## Documentation status
 
@@ -56,9 +56,9 @@ Phases 1–3 are complete and the Phase 4 business-core vertical slice is implem
 
 ## Prohibited until explicit follow-up approval
 
-- Search/sort/pagination/cache, project assignment, version conflicts, status transitions, audit, Gantt, or Kanban
+- Assignee search, project assignment, version conflicts, status transitions, audit, Gantt, or Kanban
 - GitHub Actions
-- Phase 4 commit, push, pull request, or deployment
+- Phase 5 commit, push, pull request, or deployment
 
 ## Phase 4 verification — 2026-08-12
 
@@ -82,3 +82,14 @@ Phases 1–3 are complete and the Phase 4 business-core vertical slice is implem
 - Next.js same-origin login→me→logout was verified over real container TCP.
 - 18 frontend tests and 23 backend tests passed; lint, format, typecheck, build, migration upgrade/current/check passed.
 - Frontend tests use jsdom rather than a real browser; Playwright remains unimplemented.
+
+## Phase 5 verification — 2026-08-12
+
+- Project list implements case-insensitive name, status, customer, property, and inclusive/one-sided date-overlap filters. `assignee_id` is rejected and remains Phase 6.
+- Fixed SQLAlchemy sort mapping covers code, name, start/end dates, and created/updated timestamps with stable ID ordering. Page defaults are 1/20 with maximum 100.
+- Customer, Property, and Project lists share `items`, `page`, `page_size`, `total`, and `total_pages`.
+- Frontend URL restoration, submitted fields, immediate select/sort/page controls, reset, current-condition text, pagination, stale-result suppression, and cache policy are covered in jsdom.
+- 43 frontend tests passed in the approved Node 22.23.2 container; ESLint, Prettier check, TypeScript check, and the dedicated Node 22.23.2 Next.js production build stage passed.
+- 68 backend tests passed against PostgreSQL 16.14, including each filter independently and both directions for all sort columns. Ruff lint and format check passed.
+- Alembic upgrade/current/check passed at `20260812_02`; Next.js same-origin login plus Project pagination and invalid-period validation passed over real TCP.
+- No Playwright suite was added or run; browser coverage remains part of the later TEST-001 work.

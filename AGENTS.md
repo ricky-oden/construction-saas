@@ -40,7 +40,7 @@ Normal initial design within an unmodified approved scope is not a `PROPOSED_CHA
 
 ## Current implementation gate
 
-Phases 1–3 are committed and pushed. Phase 4 Customer/Property/Project vertical slice is implemented and verified but remains uncommitted pending review. Phase 5 and later work remains gated. Search/cache expansion, project assignment, status services, optimistic locking, audit history, Gantt, Kanban, GitHub Actions, Phase 4 commits, and pushes require a later explicit instruction.
+Phases 1–4 are committed and pushed. Phase 5 search, sorting, pagination, and cache policy is implemented but remains uncommitted pending verification review. Phase 6 and later work remains gated. Assignee search, project assignment, status services, optimistic locking, audit history, Gantt, Kanban, GitHub Actions, Phase 5 commits, and pushes require a later explicit instruction.
 
 ## Quiz mode
 

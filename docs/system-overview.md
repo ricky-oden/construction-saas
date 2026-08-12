@@ -35,7 +35,7 @@ PostgreSQL 16.14 (Compose db:5432; no host port)
   - business data, token sessions, constraints, versions, audit logs
 ```
 
-Phase 4 extends this path through Customer, Property, and Project tables, services, protected management APIs, and nine Next.js management routes. ADMIN and MANAGER can register and update these resources; MEMBER receives 403 until assigned-project access is implemented in Phase 6. Search, transitions, version conflicts, assignments, and audit remain later-phase work.
+Phase 5 extends this path with server-side Project filters, inclusive date overlap, fixed-column stable sorting, shared list pagination metadata, URL-restorable frontend conditions, and feature query-key/cache policy. ADMIN and MANAGER retain access; MEMBER and `assignee_id` search wait for assignment work in Phase 6. Transitions, version conflicts, assignments, and audit remain later-phase work.
 
 ## Local container topology
 

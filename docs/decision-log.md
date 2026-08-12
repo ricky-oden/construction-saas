@@ -74,6 +74,17 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-044 | Keep status at creation default `DRAFT` and version at 1. Do not accept status writes, increment version, detect conflicts, assign users, or create audit records in Phase 4. |
 | DEC-045 | Use `is_active` for Customer/Property and `is_archived` for Project, exclude them from default lists, retain detail access, and expose no physical-delete endpoint. |
 
+## 2026-08-12 — Phase 5 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-046 | Search Project by case-insensitive name substring, status, customer, property, and date overlap. Defer `assignee_id` until ProjectAssignee exists in Phase 6, so SEARCH-001 remains PARTIAL. |
+| DEC-047 | Define inclusive overlap as `start_date <= period_to AND end_date >= period_from`; apply either boundary independently and reject a reversed complete range through the common validation envelope. |
+| DEC-048 | Map the six approved sort names to fixed SQLAlchemy columns. Default to `updated_at desc` and apply `id` in the same direction as the stable second ordering term. |
+| DEC-049 | Use one pagination contract for Customer, Property, and Project lists: page 1, page size 20, maximum 100, with `items`, `page`, `page_size`, `total`, and `total_pages`. |
+| DEC-050 | Treat the URL query as the restorable Project-list state and include every result-changing normalized condition in the feature query-key factory. Do not retain prior-condition data while a new cache key loads. |
+| DEC-051 | On successful business mutations, update the affected detail cache and invalidate the resource's list-key family. Do not retry HTTP 4xx queries; bound other query retries and keep mutations non-retrying. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.

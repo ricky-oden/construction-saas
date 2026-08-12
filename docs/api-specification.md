@@ -46,7 +46,7 @@ Authentication failures use HTTP 401 and `AUTHENTICATION_REQUIRED` or `INVALID_C
 
 | Method | Path | Purpose | Requirement |
 |---|---|---|---|
-| GET | `/api/v1/projects` | List non-archived projects | PRJ-001 |
+| GET | `/api/v1/projects` | Search/filter/sort/page non-archived projects | PRJ-001, SEARCH-001 |
 | POST | `/api/v1/projects` | Register project | PRJ-001, DATA-002 |
 | GET | `/api/v1/projects/{project_id}` | Get authorized project detail | PRJ-001 |
 | PATCH | `/api/v1/projects/{project_id}` | Update Phase 4 project fields | PRJ-001 |
@@ -57,20 +57,20 @@ Authentication failures use HTTP 401 and `AUTHENTICATION_REQUIRED` or `INVALID_C
 
 The first four project endpoints are implemented for ADMIN and MANAGER. `PATCH` can update `is_archived`, but cannot write status or version. No DELETE endpoint exists. The archive, assignment, transition, and history endpoints in the table remain planned.
 
-Planned Phase 5 list query parameters:
+Implemented Phase 5 list query parameters:
 
 - `name`
-- `assignee_id`
 - `status`
+- `customer_id`
+- `property_id`
 - `period_from`
 - `period_to`
 - `sort`
 - `order`
 - `page`
 - `page_size`
-- optional `include_archived` for authorized management use
 
-Planned list response metadata includes `items`, `page`, `page_size`, and `total`.
+`assignee_id` remains Phase 6 work and is rejected as an unknown query parameter. Name matching is case-insensitive substring matching. Period bounds use inclusive date overlap and may be supplied independently. `sort` is restricted to `code`, `name`, `start_date`, `end_date`, `created_at`, or `updated_at`; `order` is `asc` or `desc`. Defaults are `updated_at desc`, page 1, and page size 20; page size is capped at 100. Customer, Property, and Project list responses all include `items`, `page`, `page_size`, `total`, and `total_pages`.
 
 ## Customers
 

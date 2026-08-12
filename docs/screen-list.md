@@ -8,7 +8,7 @@ The Phase 3 authentication screens and the Phase 4 Customer/Property/Project lis
 |---|---|---|---|---|
 | SCR-001 | `/login` | Login | AUTH-001 | Public — implemented |
 | INF-001 | `/account` | Protected authentication/role foundation | AUTH-001–003 | Authenticated — implemented |
-| SCR-002 | `/projects` | Project list | PRJ-001 | ADMIN, MANAGER — implemented |
+| SCR-002 | `/projects` | Project list/search/pagination | PRJ-001, SEARCH-001, CACHE-001 | ADMIN, MANAGER — implemented through Phase 5 |
 | SCR-003 | `/projects/new` | Project registration | PRJ-001, DATA-001, DATA-002 | ADMIN, MANAGER — implemented |
 | SCR-004 | `/projects/[projectId]` | Project detail/update | PRJ-001, DATA-001, DATA-002 | ADMIN, MANAGER — implemented |
 | SCR-006 | `/customers` | Customer list | PRJ-002 | ADMIN, MANAGER — implemented |
@@ -25,7 +25,7 @@ The Phase 3 authentication screens and the Phase 4 Customer/Property/Project lis
 
 - Authentication-required routes send the opaque Bearer token with API calls.
 - Frontend authorization determines visibility and disabled state, but a hidden control never substitutes for backend checks.
-- Phase 4 list screens provide loading, error, and empty states. Project search, filtering, sorting, and pagination remain Phase 5 work.
+- Project list conditions are URL-backed and restore across history navigation and reload. Name/date fields apply on submit; select, sorting, page size, and page controls update the URL and API selection. Loading, error, empty, current-condition, reset, and pagination states are explicit.
 - React Hook Form manages editable form state and validation messages.
 - Unified API errors distinguish authentication, authorization, validation, not found, version conflict, and server failure.
 - Major business records use archive/active operations rather than physical-delete UX.

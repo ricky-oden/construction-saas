@@ -114,6 +114,8 @@ The seed command is idempotent and uses the learning-only passwords from `.env`.
 
 ADMIN and MANAGER can use the Phase 4 screens at `/customers`, `/properties`, and `/projects`, including their registration and detail/update routes. MEMBER receives 403 for these general-management APIs and screens; assigned-project access waits for the assignment implementation in Phase 6.
 
+The Phase 5 Project list synchronizes submitted name/date conditions and immediately changed select/sort/page controls with the URL. It supports status, customer, property, inclusive date-overlap, fixed-column sorting, and pagination. Browser history and reload restore the URL-backed conditions. `assignee_id` search remains absent until ProjectAssignee is implemented in Phase 6.
+
 ## Authentication security boundary
 
 Passwords are hashed with Argon2id. Login returns a random opaque token with an eight-hour lifetime; PostgreSQL stores only its SHA-256 hash. A partial unique index permits one unrevoked session per user; re-login revokes the previous row before creating the new session. Inactive users cannot log in or use an existing token.
@@ -157,4 +159,4 @@ Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanb
 
 ## Current boundary
 
-Phase 4 contains Customer, Property, and Project list/create/detail/update only. It has no project assignment, version-conflict handling, status transition service, audit history, search/sort/pagination, Gantt, Kanban, GitHub Actions workflow, or production deployment.
+Phase 5 adds Project search/filter/sort/pagination and list/detail cache policy. It has no assignee search or project assignment, version-conflict handling, status transition service, audit history, Gantt, Kanban, GitHub Actions workflow, or production deployment.
