@@ -28,6 +28,7 @@ export const defaultProjectSearch: ProjectSearchParams = {
   status: "",
   customer_id: null,
   property_id: null,
+  assignee_id: null,
   period_from: "",
   period_to: "",
   sort: "updated_at",
@@ -62,6 +63,7 @@ export function projectSearchFromUrl(
   const order = searchParams.get("order") ?? "";
   const customerId = searchParams.get("customer_id");
   const propertyId = searchParams.get("property_id");
+  const assigneeId = searchParams.get("assignee_id");
   return {
     name: searchParams.get("name")?.trim() ?? "",
     status: statuses.has(status as ProjectStatus)
@@ -69,6 +71,7 @@ export function projectSearchFromUrl(
       : "",
     customer_id: customerId ? positiveInteger(customerId, 0) || null : null,
     property_id: propertyId ? positiveInteger(propertyId, 0) || null : null,
+    assignee_id: assigneeId ? positiveInteger(assigneeId, 0) || null : null,
     period_from: searchParams.get("period_from") ?? "",
     period_to: searchParams.get("period_to") ?? "",
     sort: sorts.has(sort as ProjectSort) ? (sort as ProjectSort) : "updated_at",
@@ -95,6 +98,7 @@ export function describeProjectSearch(params: ProjectSearchParams) {
     params.status && `状態: ${params.status}`,
     params.customer_id && `顧客ID: ${params.customer_id}`,
     params.property_id && `物件ID: ${params.property_id}`,
+    params.assignee_id && `担当者ID: ${params.assignee_id}`,
     params.period_from && `期間開始: ${params.period_from}`,
     params.period_to && `期間終了: ${params.period_to}`,
     `並び順: ${params.sort} ${params.order}`,

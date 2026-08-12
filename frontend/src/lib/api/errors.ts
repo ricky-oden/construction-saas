@@ -5,6 +5,9 @@ export type ApiFieldError = {
 };
 
 export type ApiConflict = {
+  resource_type?: string;
+  resource_id?: number;
+  expected_version?: number;
   current_version?: number;
 };
 

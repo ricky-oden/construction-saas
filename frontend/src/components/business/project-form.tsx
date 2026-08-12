@@ -8,6 +8,7 @@ import { businessApi, writeBusiness } from "@/business/api";
 import { formErrorMessage } from "@/business/form-error";
 import { businessKeys, referenceListParams } from "@/business/query-keys";
 import type { Project } from "@/business/types";
+import { ApiClientError } from "@/lib/api/errors";
 import { Button } from "@/components/ui/button";
 
 type ProjectFields = {
@@ -18,7 +19,6 @@ type ProjectFields = {
   property_id: number;
   start_date: string;
   end_date: string;
-  is_archived: boolean;
 };
 
 export function ProjectForm({
@@ -45,7 +45,6 @@ export function ProjectForm({
         property_id: project?.property_id,
         start_date: project?.start_date ?? "",
         end_date: project?.end_date ?? "",
-        is_archived: project?.is_archived ?? false,
       },
     },
   );
@@ -59,7 +58,7 @@ export function ProjectForm({
       writeBusiness<Project>(
         project ? `/projects/${project.id}` : "/projects",
         project ? "PATCH" : "POST",
-        project ? values : { ...values, is_archived: undefined },
+        project ? { ...values, expected_version: project.version } : values,
       ),
     onSuccess: async (saved) => {
       queryClient.setQueryData(businessKeys.projects.detail(saved.id), saved);
@@ -78,7 +77,17 @@ export function ProjectForm({
     try {
       await mutation.mutateAsync(values);
     } catch (error) {
-      setApiError(formErrorMessage(error));
+      if (error instanceof ApiClientError && error.status === 409) {
+        const conflict = error.response.error.conflict;
+        setApiError(
+          `競合が発生しました。送信version ${conflict?.expected_version}、現在version ${conflict?.current_version}。再取得してください。`,
+        );
+        await queryClient.invalidateQueries({
+          queryKey: businessKeys.projects.all,
+        });
+      } else {
+        setApiError(formErrorMessage(error));
+      }
     }
   });
 
@@ -170,10 +179,6 @@ export function ProjectForm({
             状態: {project.status}／version: {project.version}（Phase
             6まで変更対象外）
           </p>
-          <label className="checkbox-row">
-            <input type="checkbox" {...register("is_archived")} />
-            アーカイブ
-          </label>
         </>
       )}
       {Object.values(formState.errors).map((error, index) => (

@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
-import { ManagementRoute } from "@/auth/management-route";
+import { useAuth } from "@/auth/auth-provider";
+import { ProtectedRoute } from "@/auth/protected-route";
 import { businessApi } from "@/business/api";
 import {
   defaultProjectSearch,
@@ -23,6 +24,8 @@ type SearchFields = Omit<ProjectSearchParams, "page">;
 
 export function ProjectsPageContent() {
   const router = useRouter();
+  const { user } = useAuth();
+  const management = user?.role === "ADMIN" || user?.role === "MANAGER";
   const searchParams = useSearchParams();
   const searchText = searchParams.toString();
   const current = useMemo(
@@ -42,6 +45,11 @@ export function ProjectsPageContent() {
   const properties = useQuery({
     queryKey: businessKeys.properties.list(referenceListParams),
     queryFn: () => businessApi.properties(referenceListParams),
+  });
+  const assignees = useQuery({
+    queryKey: businessKeys.assignees.list(),
+    queryFn: businessApi.assignees,
+    enabled: management,
   });
   const projects = useQuery({
     queryKey: businessKeys.projects.list(current),
@@ -70,16 +78,18 @@ export function ProjectsPageContent() {
     ) ?? [];
 
   return (
-    <ManagementRoute>
+    <ProtectedRoute>
       <main className="page-stack">
         <div className="page-heading">
           <div>
             <p className="eyebrow">案件管理</p>
             <h1>案件一覧</h1>
           </div>
-          <Link className="button-link" href="/projects/new">
-            案件を登録
-          </Link>
+          {management && (
+            <Link className="button-link" href="/projects/new">
+              案件を登録
+            </Link>
+          )}
         </div>
 
         <form className="panel search-grid" onSubmit={submit} noValidate>
@@ -155,6 +165,28 @@ export function ProjectsPageContent() {
             期間開始
             <input type="date" {...register("period_from")} />
           </label>
+          {management && (
+            <label>
+              担当者
+              <select
+                {...register("assignee_id", {
+                  onChange: (event) =>
+                    updateSelect({
+                      assignee_id: event.target.value
+                        ? Number(event.target.value)
+                        : null,
+                    }),
+                })}
+              >
+                <option value="">すべて</option>
+                {assignees.data?.items.map((assignee) => (
+                  <option key={assignee.id} value={assignee.id}>
+                    {assignee.display_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <label>
             期間終了
             <input type="date" {...register("period_to")} />
@@ -260,7 +292,7 @@ export function ProjectsPageContent() {
           </>
         )}
       </main>
-    </ManagementRoute>
+    </ProtectedRoute>
   );
 }
 

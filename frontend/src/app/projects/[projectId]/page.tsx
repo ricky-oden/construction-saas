@@ -4,21 +4,25 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
-import { ManagementRoute } from "@/auth/management-route";
+import { useAuth } from "@/auth/auth-provider";
+import { ProtectedRoute } from "@/auth/protected-route";
 import { businessApi } from "@/business/api";
 import { businessKeys } from "@/business/query-keys";
 import { ProjectForm } from "@/components/business/project-form";
+import { ProjectWorkflow } from "@/components/business/project-workflow";
 import { AsyncState } from "@/components/ui/async-state";
 
 export default function ProjectDetailPage() {
   const id = Number(useParams<{ projectId: string }>().projectId);
   const [saved, setSaved] = useState(false);
+  const { user } = useAuth();
+  const management = user?.role === "ADMIN" || user?.role === "MANAGER";
   const query = useQuery({
     queryKey: businessKeys.projects.detail(id),
     queryFn: () => businessApi.project(id),
   });
   return (
-    <ManagementRoute>
+    <ProtectedRoute>
       <main className="page-stack narrow-page">
         {query.isPending ? (
           <AsyncState kind="loading" />
@@ -28,16 +32,19 @@ export default function ProjectDetailPage() {
           <section className="panel">
             <h1>案件詳細・更新</h1>
             {saved && <p role="status">保存しました。</p>}
-            <ProjectForm
-              project={query.data}
-              onSaved={() => {
-                query.refetch();
-                setSaved(true);
-              }}
-            />
+            {management && (
+              <ProjectForm
+                project={query.data}
+                onSaved={() => {
+                  query.refetch();
+                  setSaved(true);
+                }}
+              />
+            )}
+            <ProjectWorkflow project={query.data} />
           </section>
         )}
       </main>
-    </ManagementRoute>
+    </ProtectedRoute>
   );
 }

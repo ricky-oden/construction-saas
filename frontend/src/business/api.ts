@@ -1,5 +1,7 @@
 import type {
   Customer,
+  Assignee,
+  AuditLog,
   ListResponse,
   PaginationParams,
   Project,
@@ -28,11 +30,14 @@ export const businessApi = {
   projects: (params: ProjectSearchParams) =>
     apiRequest<ListResponse<Project>>(listPath("/projects", params)),
   project: (id: number) => apiRequest<Project>(`/projects/${id}`),
+  assignees: () => apiRequest<{ items: Assignee[] }>("/assignees"),
+  history: (id: number) =>
+    apiRequest<{ items: AuditLog[] }>(`/projects/${id}/history`),
 };
 
 export function writeBusiness<T>(
   path: string,
-  method: "POST" | "PATCH",
+  method: "POST" | "PATCH" | "PUT",
   body: unknown,
 ) {
   return apiRequest<T>(path, {

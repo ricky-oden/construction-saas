@@ -40,6 +40,7 @@ export type ProjectSearchParams = PaginationParams & {
   status: ProjectStatus | "";
   customer_id: number | null;
   property_id: number | null;
+  assignee_id: number | null;
   period_from: string;
   period_to: string;
   sort: ProjectSort;
@@ -60,6 +61,24 @@ export type Project = {
   is_archived: boolean;
   created_at: string;
   updated_at: string;
+  assignees: Assignee[];
+};
+
+export type Assignee = {
+  id: number;
+  display_name: string;
+  is_active: boolean;
+};
+
+export type AuditLog = {
+  id: number;
+  project_id: number;
+  actor_user_id: number;
+  action: string;
+  before_values: Record<string, unknown>;
+  after_values: Record<string, unknown>;
+  project_version: number;
+  occurred_at: string;
 };
 
 export type ListResponse<T> = {
