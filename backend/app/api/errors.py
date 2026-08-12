@@ -4,6 +4,7 @@ from http import HTTPStatus
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.schemas import ApiErrorBody, ApiErrorResponse, ApiFieldError
@@ -65,7 +66,21 @@ async def unexpected_exception_handler(request: Request, exception: Exception) -
     )
 
 
+async def database_exception_handler(request: Request, exception: SQLAlchemyError) -> JSONResponse:
+    logger.exception(
+        "Database operation failed for %s %s",
+        request.method,
+        request.url.path,
+        exc_info=(type(exception), exception, exception.__traceback__),
+    )
+    return _response(
+        HTTPStatus.SERVICE_UNAVAILABLE,
+        ApiErrorBody(code="DATABASE_UNAVAILABLE", message="Database is unavailable."),
+    )
+
+
 def register_exception_handlers(application: FastAPI) -> None:
     application.add_exception_handler(RequestValidationError, validation_exception_handler)
     application.add_exception_handler(StarletteHTTPException, http_exception_handler)
+    application.add_exception_handler(SQLAlchemyError, database_exception_handler)
     application.add_exception_handler(Exception, unexpected_exception_handler)

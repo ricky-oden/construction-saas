@@ -1,1 +1,1 @@
-"""Database integration boundary reserved for Phase 2."""
+"""Database integration boundary."""
