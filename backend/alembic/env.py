@@ -4,7 +4,7 @@ from alembic import context
 from app.core.settings import get_settings
 from app.db.base import Base
 from app.db.session import get_engine
-from app.models import auth  # noqa: F401
+from app.models import auth, business  # noqa: F401
 
 config = context.config
 
