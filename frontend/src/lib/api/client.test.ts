@@ -55,4 +55,30 @@ describe("apiRequest authentication", () => {
 
     expect(window.localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)).toBeNull();
   });
+
+  it("can defer the shared 401 side effect for rollback-first mutations", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        jsonResponse(401, {
+          error: {
+            code: "AUTHENTICATION_REQUIRED",
+            message: "Authentication is required.",
+            field_errors: [],
+            conflict: null,
+          },
+        }),
+      ),
+    );
+
+    await expect(
+      apiRequest("/projects/1/status-transitions", undefined, {
+        handleUnauthorized: false,
+      }),
+    ).rejects.toThrow("Authentication is required.");
+
+    expect(window.localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)).toBe(
+      "raw-demo-token",
+    );
+  });
 });
