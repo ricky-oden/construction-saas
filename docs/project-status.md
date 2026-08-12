@@ -6,15 +6,16 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 - Repository bootstrap: README and ignore rules only before this planning set
 - Approved plan documentation: `CONSTRUCTION-V1.0` initial baseline approved
-- Product implementation: not started
-- Current gate: explicit implementation approval after relevant unresolved decisions
+- Product implementation: Phase 1 foundation implemented and verified
+- Current gate: Phase 1 review; Phase 2 requires separate approval
 
 ## Phase gates
 
 | Gate | Required evidence | Current state |
 |---|---|---|
 | Planning approved | User approves requirements, decisions, scope, and unresolved-item handling | APPROVED |
-| Foundation approved | Explicit authorization to scaffold/install/build Docker/migrate | PENDING |
+| Phase 1 scaffold approved | Explicit authorization to scaffold/install and verify local quality commands | APPROVED |
+| Phase 2 environment approved | Explicit authorization to build Docker/PostgreSQL/migration infrastructure | PENDING |
 | Core slice verified | Login, authorization, data constraints, list/detail/create/update tests pass | NOT_STARTED |
 | Scheduling verified | Gantt date/pixel tests and browser flow pass | NOT_STARTED |
 | Workflow verified | Kanban success, rollback, 409, role tests pass | NOT_STARTED |

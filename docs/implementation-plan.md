@@ -25,9 +25,9 @@ Build a learning-oriented construction project management SaaS that connects UI 
 
 | Phase | Scope | Requirement groups | Status |
 |---|---|---|---|
-| 0 | Approve and freeze planning documents | All | Documentation prepared; implementation not started |
-| 1 | Scaffold frontend/backend and local quality commands | ENV, UI | Not implemented |
-| 2 | Docker Compose, PostgreSQL, Alembic, shared API errors | ENV, API, DATA | Not implemented |
+| 0 | Approve and freeze planning documents | All | Completed |
+| 1 | Scaffold frontend/backend and local quality commands | ENV, UI | Implemented and verified; review pending |
+| 2 | Docker Compose, PostgreSQL, Alembic, and DB-facing error integration | ENV, API, DATA | Not implemented |
 | 3 | Learning login, opaque token, users/assignees, authorization base | AUTH | Not implemented |
 | 4 | Customer, property, project list/detail/create/update vertical slice | DATA, PRJ | Not implemented |
 | 5 | Search, filtering, sorting, pagination, cache policy | SEARCH, CACHE | Not implemented |

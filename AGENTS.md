@@ -40,7 +40,7 @@ Normal initial design within an unmodified approved scope is not a `PROPOSED_CHA
 
 ## Current implementation gate
 
-The repository is in documentation-only planning. All product requirements are unimplemented. Scaffold creation, dependency installation, Docker construction, migrations, GitHub Actions, commits, and pushes require a later explicit instruction.
+Phase 1 frontend/backend scaffold and local quality commands are implemented and verified. Phase 2 and later work remains gated. Docker/Compose configuration, PostgreSQL connection/schema, migration revisions, authentication, business models/APIs/services, audit history, Gantt, Kanban, GitHub Actions, commits, and pushes require a later explicit instruction.
 
 ## Quiz mode
 

@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirement: TEST-001
 
-Status: `NOT_IMPLEMENTED`
+Status: `PARTIAL` — Phase 1 foundation coverage implemented; later business, browser, and database coverage remains.
 
 ## Principles
 
@@ -16,6 +16,18 @@ Status: `NOT_IMPLEMENTED`
 
 ## Frontend: Vitest and React Testing Library
 
+Phase 1 verified in jsdom:
+
+- Top page
+- Loading, error, and empty states
+- Disabled and explicitly loading button states
+- React Hook Form input retention and required validation
+- 404 component and return link
+
+These are component tests; they do not launch a real browser or exercise a live backend.
+
+Later phases add:
+
 - Gantt date-range intersection, clipping, and pixel geometry pure functions
 - Search parameter normalization and query-key construction
 - Form validation and retained input on API error
@@ -24,6 +36,17 @@ Status: `NOT_IMPLEMENTED`
 - Kanban `onMutate` snapshot, optimistic cache update, rollback, and invalidation behavior
 
 ## Backend: pytest
+
+Phase 1 verified with in-process FastAPI TestClient:
+
+- Health success
+- Unified validation and 404 errors
+- Unified unexpected 500 error
+- Internal exception text is absent from the response
+
+These automated tests do not use a live TCP server or database. Separate manual smoke checks started the Next.js and Uvicorn development servers and received 200 responses over local TCP.
+
+Later phases add:
 
 - Login, active/revoked/invalid opaque token behavior
 - ADMIN/MANAGER/MEMBER authorization and assigned-project scope
@@ -34,7 +57,7 @@ Status: `NOT_IMPLEMENTED`
 - Status transition service against the approved matrix
 - Integer-version increment and HTTP 409 conflict
 - Audit contents and mutation/audit atomicity
-- Unified API error contract
+- Business endpoint use of the Phase 1 common API error contract
 
 ## PostgreSQL integration
 
@@ -80,7 +103,7 @@ SQLite-only verification is insufficient for these cases.
 
 ## CI boundary
 
-GitHub Actions is not part of the current documentation-only work. When separately approved, initial CI must follow the parent blueprint's `workflow_dispatch`-only rule until automatic triggers are explicitly approved.
+GitHub Actions is not part of Phase 1 and no workflow exists. When separately approved, initial CI must follow the parent blueprint's `workflow_dispatch`-only rule until automatic triggers are explicitly approved.
 
 ## Unresolved test setup
 
@@ -88,4 +111,4 @@ GitHub Actions is not part of the current documentation-only work. When separate
 - Fixture/seed identities and credentials
 - Browser matrix
 - Coverage thresholds
-- Exact formatter, lint, type-check, and migration-check commands
+- Migration-check command, to be fixed when Phase 2 migration infrastructure exists

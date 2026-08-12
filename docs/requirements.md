@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Status vocabulary: every requirement below is `NOT_IMPLEMENTED`.
+Implementation status is tracked in `docs/status.md`; this file remains the authoritative definition of all 26 requirements and acceptance criteria.
 
 ## Environment and architecture
 

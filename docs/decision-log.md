@@ -27,6 +27,17 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-017 | Retain GitHub Actions as a future parent-plan technology, but create no workflow until separately approved; the initial workflow is manual `workflow_dispatch` only. |
 | DEC-018 | Preserve the career material's shared UI/form behavior and unified API error handling as explicit requirements. |
 
+## 2026-08-12 — Phase 1 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-019 | Pin Node.js 22.23.2 and npm 10.9.8. This Node patch satisfies Next.js 16.3.0, Vitest 4.1.10, Vite transitive requirements, and jsdom 29.1.1 while retaining the approved Node 22 family. |
+| DEC-020 | Pin frontend runtime packages to Next.js 16.3.0, React/React DOM 19.2.8, TanStack Query 5.101.4, and React Hook Form 7.85.0. These were current mutually compatible patches confirmed from npm metadata on 2026-08-12. |
+| DEC-021 | Pin frontend development packages in `package.json` and the full dependency graph in `package-lock.json`; use ESLint 9.39.5 with eslint-config-next 16.3.0, Prettier 3.9.6, TypeScript 5.9.3, Vitest 4.1.10, React Testing Library 16.3.2, and jsdom 29.1.1. |
+| DEC-022 | Pin Python 3.12.13 and the backend requirement files. Runtime contains FastAPI 0.141.1, Pydantic 2.13.4, pydantic-settings 2.15.0, SQLAlchemy 2.0.52, Alembic 1.19.1, and Uvicorn 0.52.1; development/test adds pytest 9.1.1, Ruff 0.16.2, and the TestClient HTTP stack. This matches the compatible FastAPI/Python 3.12 set already verified in TEA-V1. |
+| DEC-023 | Keep pytest, Ruff, and HTTP test tooling out of `requirements.txt`; `requirements-dev.txt` includes runtime requirements and adds development/test-only packages. |
+| DEC-024 | Fix the Phase 1 common API error envelope as `error.code`, `error.message`, `error.field_errors`, and optional `error.conflict`. Exact 409 conflict metadata remains unresolved for its later phase. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.
