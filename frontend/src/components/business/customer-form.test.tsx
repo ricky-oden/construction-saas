@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { expect, it, vi } from "vitest";
 
 import { CustomerForm } from "@/components/business/customer-form";
+import { businessKeys } from "@/business/query-keys";
 
 const writeBusiness = vi.fn();
 
@@ -61,4 +62,44 @@ it("disables the customer submit button while saving", async () => {
   expect(screen.getByRole("button", { name: "処理中です…" })).toBeDisabled();
   resolveRequest?.({ id: 2 });
   await waitFor(() => expect(onSaved).toHaveBeenCalled());
+});
+
+it("updates the detail cache and invalidates customer lists after success", async () => {
+  const saved = {
+    id: 3,
+    code: "CUS-003",
+    name: "Cache Customer",
+    contact_name: null,
+    phone: null,
+    email: null,
+    is_active: true,
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-01-01T00:00:00Z",
+  };
+  writeBusiness.mockResolvedValueOnce(saved);
+  const client = new QueryClient();
+  const invalidate = vi.spyOn(client, "invalidateQueries");
+  render(
+    <QueryClientProvider client={client}>
+      <CustomerForm onSaved={vi.fn()} />
+    </QueryClientProvider>,
+  );
+  await userEvent.type(
+    screen.getByRole("textbox", { name: "顧客コード" }),
+    saved.code,
+  );
+  await userEvent.type(
+    screen.getByRole("textbox", { name: "顧客名" }),
+    saved.name,
+  );
+  await userEvent.click(screen.getByRole("button", { name: "保存" }));
+
+  await waitFor(() =>
+    expect(invalidate).toHaveBeenCalledWith({
+      queryKey: businessKeys.customers.lists(),
+    }),
+  );
+  expect(client.getQueryData(businessKeys.customers.detail(saved.id))).toEqual(
+    saved,
+  );
 });
