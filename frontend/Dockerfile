@@ -25,6 +25,8 @@ EXPOSE 3000
 CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3000"]
 
 FROM dependencies AS build
+ARG BACKEND_INTERNAL_URL=http://localhost:8002
+ENV BACKEND_INTERNAL_URL=$BACKEND_INTERNAL_URL
 COPY --chown=node:node . .
 RUN npm run build
 

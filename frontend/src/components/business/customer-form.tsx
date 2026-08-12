@@ -36,12 +36,22 @@ export function CustomerForm({
     },
   });
   const mutation = useMutation({
-    mutationFn: (values: CustomerFields) =>
-      writeBusiness<Customer>(
+    mutationFn: (values: CustomerFields) => {
+      const body = customer
+        ? values
+        : {
+            code: values.code,
+            name: values.name,
+            contact_name: values.contact_name,
+            phone: values.phone,
+            email: values.email,
+          };
+      return writeBusiness<Customer>(
         customer ? `/customers/${customer.id}` : "/customers",
         customer ? "PATCH" : "POST",
-        values,
-      ),
+        body,
+      );
+    },
     onSuccess: async (saved) => {
       queryClient.setQueryData(businessKeys.customers.detail(saved.id), saved);
       await queryClient.invalidateQueries({

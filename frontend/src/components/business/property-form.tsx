@@ -43,7 +43,16 @@ export function PropertyForm({
   });
   const mutation = useMutation({
     mutationFn: (values: PropertyFields) => {
-      const body = property ? { ...values, customer_id: undefined } : values;
+      const body = property
+        ? { ...values, customer_id: undefined }
+        : {
+            customer_id: values.customer_id,
+            name: values.name,
+            postal_code: values.postal_code,
+            prefecture: values.prefecture,
+            city: values.city,
+            address_line: values.address_line,
+          };
       return writeBusiness<Property>(
         property ? `/properties/${property.id}` : "/properties",
         property ? "PATCH" : "POST",

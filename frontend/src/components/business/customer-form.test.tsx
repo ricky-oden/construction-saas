@@ -102,4 +102,9 @@ it("updates the detail cache and invalidates customer lists after success", asyn
   expect(client.getQueryData(businessKeys.customers.detail(saved.id))).toEqual(
     saved,
   );
+  expect(writeBusiness).toHaveBeenCalledWith(
+    "/customers",
+    "POST",
+    expect.not.objectContaining({ is_active: expect.anything() }),
+  );
 });
