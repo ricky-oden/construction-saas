@@ -9,16 +9,16 @@ CONSTRUCTION-V1 is a learning-oriented SaaS for construction and equipment-work 
 ## Responsibility map
 
 ```text
-Browser / Next.js App Router
+Browser -> localhost:3000 / Next.js App Router
   - routes and screens
   - React Hook Form input state
   - TanStack Query server-state cache
   - Gantt pure calculations and rendering
   - Kanban optimistic feedback and rollback
           |
-          | JSON REST + opaque Bearer token
+          | same-origin /api/v1 rewrite
           v
-FastAPI
+FastAPI (Compose backend:8000; host localhost:8002)
   - request/response validation
   - authentication and final authorization
   - customer/property consistency
@@ -31,9 +31,20 @@ SQLAlchemy / Alembic
   - ORM persistence and schema migration
           |
           v
-PostgreSQL 16
+PostgreSQL 16.14 (Compose db:5432; no host port)
   - business data, token sessions, constraints, versions, audit logs
 ```
+
+Phase 2 provides this path only through DB-backed health; authentication and all business routes shown as responsibilities remain later-phase work.
+
+## Local container topology
+
+- `frontend`: Node.js 22.23.2, source mount plus named `node_modules` volume, nonroot `node` user.
+- `backend`: Python 3.12.13 development target, source mount, nonroot UID 10001.
+- `db`: persistent `construction_saas` development database in a named volume.
+- `test-db`: profile-only `construction_saas_test` database in tmpfs.
+
+The backend lazily creates its SQLAlchemy engine/session factory from `DATABASE_URL` with pool pre-ping. Alembic reads the same settings. Importing the FastAPI application does not itself open a database connection. The health dependency executes `SELECT 1`; SQLAlchemy failures use the common safe 503 error envelope.
 
 ## Initial vertical slice
 

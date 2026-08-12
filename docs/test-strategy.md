@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirement: TEST-001
 
-Status: `PARTIAL` — Phase 1 foundation coverage implemented; later business, browser, and database coverage remains.
+Status: `PARTIAL` — Phase 1/2 foundation coverage implemented; later business and browser coverage remains.
 
 ## Principles
 
@@ -37,14 +37,22 @@ Later phases add:
 
 ## Backend: pytest
 
-Phase 1 verified with in-process FastAPI TestClient:
+Phase 2 verifies with in-process FastAPI TestClient and real PostgreSQL:
 
-- Health success
+- DB-backed health success
 - Unified validation and 404 errors
 - Unified unexpected 500 error
 - Internal exception text is absent from the response
 
-These automated tests do not use a live TCP server or database. Separate manual smoke checks started the Next.js and Uvicorn development servers and received 200 responses over local TCP.
+The suite uses a real profile-only PostgreSQL test DB for `get_db` and health. TestClient itself is in-process rather than a real TCP client. Compose healthchecks and the Next.js same-origin health request separately exercise real container TCP.
+
+Phase 2 additionally verifies:
+
+- required, valid PostgreSQL test URL with an explicit host and port
+- rejection of missing, malformed, non-PostgreSQL, and non-`_test` URLs
+- `Depends(get_db)` host, port, database, and user identity
+- stopped test DB failure without development DB fallback
+- safe DB error envelope without credentials, connection URL, or internal exception text
 
 Later phases add:
 
@@ -61,7 +69,7 @@ Later phases add:
 
 ## PostgreSQL integration
 
-Use a disposable test PostgreSQL database to verify:
+Use the Compose-profile `construction_saas_test` PostgreSQL database in tmpfs to verify:
 
 - Foreign keys and uniqueness
 - Transactions and rollback
@@ -103,12 +111,12 @@ SQLite-only verification is insufficient for these cases.
 
 ## CI boundary
 
-GitHub Actions is not part of Phase 1 and no workflow exists. When separately approved, initial CI must follow the parent blueprint's `workflow_dispatch`-only rule until automatic triggers are explicitly approved.
+GitHub Actions is not part of Phase 2 and no workflow exists. When separately approved in Phase 9, initial CI must follow the parent blueprint's `workflow_dispatch`-only rule until automatic triggers are explicitly approved.
 
 ## Unresolved test setup
 
-- Test database lifecycle command
 - Fixture/seed identities and credentials
 - Browser matrix
 - Coverage thresholds
-- Migration-check command, to be fixed when Phase 2 migration infrastructure exists
+
+Phase 2 migration checks are `alembic upgrade head`, `alembic current`, and `alembic check`. No revision exists until a later phase introduces schema metadata.

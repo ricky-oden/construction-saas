@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-The Phase 1 health endpoint is implemented. All business endpoints remain planned and `NOT_IMPLEMENTED`; their detailed schemas remain to be finalized before implementation.
+The Phase 2 DB-backed health endpoint is implemented. All business endpoints remain planned and `NOT_IMPLEMENTED`; their detailed schemas remain to be finalized before implementation.
 
 ## Common conventions
 
@@ -16,11 +16,19 @@ The Phase 1 health endpoint is implemented. All business endpoints remain planne
 - Validation returns 422 with a consistent field/non-field error shape
 - Archived/inactive major records are excluded by default
 
-## Phase 1 infrastructure
+## Phase 2 infrastructure
 
 | Method | Path | Purpose | Status |
 |---|---|---|---|
-| GET | `/api/v1/health` | Process health without a DB dependency | Implemented and verified |
+| GET | `/api/v1/health` | Verify the backend process and PostgreSQL using `SELECT 1` | Implemented and verified |
+
+Successful response:
+
+```json
+{"status": "ok", "database": "ok"}
+```
+
+If PostgreSQL is unavailable, the endpoint returns HTTP 503 with code `DATABASE_UNAVAILABLE` in the common envelope. The response does not expose the connection URL, host credentials, stack trace, or internal database exception.
 
 ## Authentication
 

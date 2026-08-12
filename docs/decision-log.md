@@ -38,6 +38,18 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-023 | Keep pytest, Ruff, and HTTP test tooling out of `requirements.txt`; `requirements-dev.txt` includes runtime requirements and adds development/test-only packages. |
 | DEC-024 | Fix the Phase 1 common API error envelope as `error.code`, `error.message`, `error.field_errors`, and optional `error.conflict`. Exact 409 conflict metadata remains unresolved for its later phase. |
 
+## 2026-08-12 — Phase 2 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-025 | Use Compose project `construction-project-saas`, frontend host port 3000, backend host port 8002, and PostgreSQL 16.14 without a host-published database port. |
+| DEC-026 | Persist `construction_saas` in a named volume and isolate profile-only `construction_saas_test` in tmpfs. Tests require an explicit PostgreSQL URL whose database ends in `_test`; failure never falls back to development. |
+| DEC-027 | Add psycopg 3.3.4 runtime packages for SQLAlchemy PostgreSQL connectivity while retaining pytest, Ruff, and the test HTTP client only in development/test dependencies. |
+| DEC-028 | Lazily create the SQLAlchemy engine/session factory with pool pre-ping. Settings, engine, and session caches have explicit test resets; application import does not connect to PostgreSQL. |
+| DEC-029 | Configure Alembic to use the same backend settings and empty metadata. Create no baseline revision because Phase 2 defines no model or schema, while `upgrade head`, `current`, and `check` remain executable. |
+| DEC-030 | Route browser API traffic through Next.js at same-origin `/api/v1`; use `BACKEND_INTERNAL_URL=http://backend:8000` only within Compose and allow `http://localhost:8002` for non-Docker backend development. |
+| DEC-031 | Use Node.js 22.23.2 and Python 3.12.13 multi-stage Dockerfiles. Frontend and backend development/production targets run nonroot; backend production inherits runtime dependencies only. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.

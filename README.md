@@ -4,7 +4,7 @@ Project ID: `CONSTRUCTION-V1`
 
 Plan version: `CONSTRUCTION-V1.0`
 
-Implementation status: Phase 1 scaffold implemented and verified
+Implementation status: Phase 2 local container and database foundation implemented and verified
 
 This repository is a learning implementation of a construction-industry project management SaaS. It is intended to make the work history described in the career material traceable from the browser through the API and ORM to PostgreSQL.
 
@@ -18,7 +18,7 @@ This repository is a learning implementation of a construction-industry project 
 - Kanban status changes with optimistic update and rollback
 - Audit history for project fields, status, dates, and assignments
 
-## Technology and fixed Phase 1 runtime
+## Technology and fixed runtime
 
 - Frontend: Node.js 22, Next.js App Router, React, TypeScript, TanStack Query, React Hook Form
 - Backend: Python 3.12, FastAPI, SQLAlchemy, Alembic
@@ -27,7 +27,7 @@ This repository is a learning implementation of a construction-industry project 
 - Environment: Docker Compose, npm
 - Planned CI after separate approval: GitHub Actions
 
-Phase 1 uses Node.js `22.23.2`, npm `10.9.8`, and Python `3.12.13`. Frontend direct dependencies are fixed in `frontend/package.json`, the complete npm graph is fixed in `frontend/package-lock.json`, and backend packages are fixed in separate runtime and development/test requirement files.
+The project uses Node.js `22.23.2`, npm `10.9.8`, Python `3.12.13`, and PostgreSQL `16.14`. Frontend direct dependencies are fixed in `frontend/package.json`, the complete npm graph is fixed in `frontend/package-lock.json`, and backend packages are fixed in separate runtime and development/test requirement files.
 
 ## Frontend commands
 
@@ -75,7 +75,41 @@ Run the development server and quality commands:
 .venv/bin/ruff format --check .
 ```
 
-The health endpoint is `GET http://127.0.0.1:8002/api/v1/health`. Phase 1 verification ran these commands successfully. pytest uses FastAPI TestClient in-process and no database; a separate development-server smoke check verified the health endpoint over real local TCP.
+Set `DATABASE_URL` before starting Uvicorn. The health endpoint is `GET http://127.0.0.1:8002/api/v1/health` and verifies both the process and PostgreSQL with `SELECT 1`.
+
+## Docker Compose development
+
+Copy the learning-only demo values, then build and start the stack:
+
+```bash
+cp .env.example .env
+docker compose config --quiet
+docker compose build
+docker compose up -d --wait
+```
+
+The Compose project name is `construction-project-saas`. Open the frontend at `http://localhost:3000`; browser API calls use the same-origin `/api/v1` path, which Next.js forwards to `http://backend:8000` inside the Compose network. For a backend running outside Docker, set `BACKEND_INTERNAL_URL=http://localhost:8002` before starting Next.js. The backend is also available to the host at port `8002`. PostgreSQL has no host-published port.
+
+The persistent development database is `construction_saas`. The isolated `construction_saas_test` database runs only with the `test` profile and stores data in tmpfs:
+
+```bash
+docker compose --profile test up -d --wait test-db
+docker compose exec -T \
+  -e TEST_DATABASE_URL=postgresql+psycopg://construction_test:construction_test_demo_password@test-db:5432/construction_saas_test \
+  backend pytest
+```
+
+Tests reject a missing/invalid test URL or a database name that does not end in `_test`; they never fall back to the development DB.
+
+Alembic shares backend settings. Phase 2 intentionally has no revision because there is no model metadata or business table yet:
+
+```bash
+docker compose exec -T backend alembic upgrade head
+docker compose exec -T backend alembic current
+docker compose exec -T backend alembic check
+```
+
+`backend/Dockerfile` separates the development/test target from the production runtime target; pytest, Ruff, and the test HTTP client are absent from production. The frontend Dockerfile similarly separates dependency, development, build, and production stages. These are local image targets, not a production deployment design.
 
 ## Phase 1 structure
 
@@ -88,9 +122,9 @@ frontend/
 backend/
   app/api/                  v1 router, health route, shared errors
   app/core/                 settings
-  app/db/                   Phase 2 database boundary only
-  alembic/                  Phase 2 placeholder only; no revision
-  tests/                    health and common-error tests
+  app/db/                   lazy SQLAlchemy engine/session and test DB guard
+  alembic/                  configured empty migration environment; no revision
+  tests/                    health, common errors, and test DB safety
 ```
 
 ## Documentation
@@ -107,4 +141,4 @@ Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanb
 
 ## Current boundary
 
-Phase 1 contains foundation code only. It has no PostgreSQL connection or schema, migration revision, Docker/Compose file, GitHub Actions workflow, authentication/authorization, business model, business API, Gantt, or Kanban implementation.
+Phase 2 contains local Docker/PostgreSQL/SQLAlchemy/Alembic infrastructure only. It has no migration revision or business table, GitHub Actions workflow, authentication/authorization, business model, business API, audit history, Gantt, or Kanban implementation.

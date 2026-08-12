@@ -26,8 +26,8 @@ Build a learning-oriented construction project management SaaS that connects UI 
 | Phase | Scope | Requirement groups | Status |
 |---|---|---|---|
 | 0 | Approve and freeze planning documents | All | Completed |
-| 1 | Scaffold frontend/backend and local quality commands | ENV, UI | Implemented and verified; review pending |
-| 2 | Docker Compose, PostgreSQL, Alembic, and DB-facing error integration | ENV, API, DATA | Not implemented |
+| 1 | Scaffold frontend/backend and local quality commands | ENV, UI | Completed |
+| 2 | Docker Compose, PostgreSQL, Alembic, and DB-facing error integration | ENV, API, DATA | Implemented and verified; review pending |
 | 3 | Learning login, opaque token, users/assignees, authorization base | AUTH | Not implemented |
 | 4 | Customer, property, project list/detail/create/update vertical slice | DATA, PRJ | Not implemented |
 | 5 | Search, filtering, sorting, pagination, cache policy | SEARCH, CACHE | Not implemented |
@@ -83,6 +83,5 @@ A phase is complete only when its mapped acceptance criteria pass, planned autom
 - Date-overlap search semantics
 - Gantt visible-range defaults and week-start convention
 - Audit retention and whether reasons are mandatory for selected actions
-- Exact Node/Python package patch versions and dependency-file format
-- Test database lifecycle and seed fixture contents
+- Seed fixture contents (test database lifecycle is fixed for Phase 2)
 - Whether the career material's broader "process/progress" wording requires data beyond project status and project date range; process/task-level Gantt remains out of scope
