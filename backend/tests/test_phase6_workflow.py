@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from datetime import date
 
 import pytest
 from fastapi.testclient import TestClient
@@ -139,6 +140,56 @@ def test_member_sees_only_assigned_projects_and_history(db_session: Session) -> 
         ).status_code
         == 403
     )
+
+
+def test_gantt_period_keeps_member_assignment_scope(db_session: Session) -> None:
+    admin, assigned_project, first, _ = setup_project(db_session)
+    outside_project = create_project(admin, "2")
+    unassigned_overlap = create_project(admin, "3")
+    assign(admin, int(assigned_project["id"]), 1, [first.id])
+    assign(admin, int(outside_project["id"]), 1, [first.id])
+    outside = db_session.get(Project, int(outside_project["id"]))
+    assert outside
+    outside.start_date = date(2026, 2, 1)
+    outside.end_date = date(2026, 2, 28)
+    db_session.commit()
+
+    member = login("first@phase6.example.com")
+    response = member.get(
+        "/api/v1/projects",
+        params={
+            "period_from": "2026-01-01",
+            "period_to": "2026-01-31",
+            "sort": "start_date",
+            "order": "asc",
+            "page_size": 100,
+        },
+    )
+    assert response.status_code == 200
+    assert [item["id"] for item in response.json()["items"]] == [assigned_project["id"]]
+    assert unassigned_overlap["id"] not in [item["id"] for item in response.json()["items"]]
+
+
+@pytest.mark.parametrize("role", [Role.ADMIN, Role.MANAGER])
+def test_gantt_period_allows_management_roles_with_stable_order(
+    db_session: Session, role: Role
+) -> None:
+    create_identity(db_session, f"{role.value.lower()}@gantt.example.com", role)
+    client = login(f"{role.value.lower()}@gantt.example.com")
+    first = create_project(client, "G1")
+    second = create_project(client, "G2")
+
+    response = client.get(
+        "/api/v1/projects",
+        params={
+            "period_from": "2026-01-01",
+            "period_to": "2026-01-31",
+            "sort": "start_date",
+            "order": "asc",
+        },
+    )
+    assert response.status_code == 200
+    assert [item["id"] for item in response.json()["items"]] == [first["id"], second["id"]]
 
 
 def test_management_can_manage_assignee_identity(db_session: Session) -> None:
