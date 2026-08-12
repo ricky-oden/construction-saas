@@ -35,7 +35,8 @@ PostgreSQL 16.14 (Compose db:5432; no host port)
   - business data, token sessions, constraints, versions, audit logs
 ```
 
-Phase 5 extends this path with server-side Project filters, inclusive date overlap, fixed-column stable sorting, shared list pagination metadata, URL-restorable frontend conditions, and feature query-key/cache policy. Phase 6 adds assignee filtering, backend-enforced MEMBER assignment scope, locked versioned writes, approved status transitions, and transactional project audit history. Gantt and Kanban remain later-phase work.
+Phase 5 extends this path with server-side Project filters, inclusive date overlap, fixed-column stable sorting, shared list pagination metadata, URL-restorable frontend conditions, and feature query-key/cache policy. Phase 6 adds assignee filtering, backend-enforced MEMBER assignment scope, locked versioned writes, approved status transitions, and transactional project audit history.
+Phase 7 reuses the authorized period-filtered Project endpoint for `/schedule`. The frontend owns Asia/Tokyo anchor selection, Monday-start visible weeks, inclusive clipping, fixed-column geometry, horizontal scrolling, and Project-detail navigation. The database and API remain date-only and contain no pixel coordinates. Kanban remains later-phase work.
 
 ## Local container topology
 

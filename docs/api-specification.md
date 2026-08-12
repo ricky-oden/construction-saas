@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-DB health, authentication, management, search, assignment, transition, conflict, and Project audit endpoints are implemented through Phase 6. Gantt and Kanban-specific APIs remain `NOT_IMPLEMENTED`.
+DB health, authentication, management, search, assignment, transition, conflict, Project audit, and the Phase 7 Gantt data path are implemented. Kanban-specific APIs remain `NOT_IMPLEMENTED`.
 
 ## Common conventions
 
@@ -72,6 +72,8 @@ Implemented Phase 5 list query parameters:
 - `page_size`
 
 Name matching is case-insensitive substring matching. Period bounds use inclusive date overlap and may be supplied independently. `assignee_id` filters through the ProjectAssignee relation. `sort` is restricted to `code`, `name`, `start_date`, `end_date`, `created_at`, or `updated_at`; `order` is `asc` or `desc`. Defaults are `updated_at desc`, page 1, and page size 20; page size is capped at 100. Customer, Property, and Project list responses all include `items`, `page`, `page_size`, `total`, and `total_pages`.
+
+Phase 7 reuses this endpoint rather than adding a duplicate Gantt endpoint. `/schedule` sends the visible inclusive bounds as `period_from`/`period_to`, requests `start_date asc` for stable `id asc` tie-breaking, and follows all pages. The response already includes authorized Project `id`, `name`, `status`, dates, and version. MEMBER assignment scope remains enforced by the backend. No pixel or drawing coordinate is returned.
 
 ## Customers
 

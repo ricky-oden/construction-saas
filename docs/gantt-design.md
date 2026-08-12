@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirements: GANTT-001, GANTT-002
 
-Status: `NOT_IMPLEMENTED`
+Status: `IMPLEMENTED_AND_VERIFIED`; review pending
 
 ## Scope
 
@@ -42,9 +42,18 @@ Status: `NOT_IMPLEMENTED`
 ## Date rules
 
 - Persist and exchange ISO dates (`YYYY-MM-DD`).
-- Decide and document the inclusive/exclusive end-date display convention before calculation implementation; persisted values remain date-based.
+- Start and end dates are inclusive.
 - Include Saturday and Sunday without special compression or color semantics required by this plan.
-- Use a consistent calendar timezone for converting any browser values to date keys; the exact policy is unresolved because domain values are dates rather than instants.
+- Today and default-anchor conversion use `Asia/Tokyo`; persisted project values remain date keys rather than instants.
+
+## Navigation and sizing
+
+- Initial state is the current Asia/Tokyo month.
+- Month mode shows the first through last day and moves one calendar month.
+- Week mode shows Monday through Sunday around the anchor and moves seven days.
+- `mode` and `anchor` are stored in `/schedule` URL query state.
+- Month columns are 40px per date and week columns are 96px per date. Width does not depend on viewport size; insufficient width scrolls horizontally.
+- The frontend follows all API pages for the visible range and uses a dedicated Gantt cache key containing both period bounds.
 
 ## Pure-function examples
 
@@ -67,11 +76,6 @@ The implemented names may differ, but the responsibilities should resemble:
 - Weekend-spanning project
 - Invalid reversed date range rejected before rendering
 
-## Unresolved details
+## Remaining boundary
 
-- Initial visible range
-- Week-start day
-- Exact month/week column width and responsive behavior
-- Date-overlap query semantics
-- Whether dates are mandatory at project creation
-- Inclusive/exclusive end-date display convention
+Holiday calendars and process/task-level bars remain explicitly out of scope.

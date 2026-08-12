@@ -31,8 +31,8 @@ Build a learning-oriented construction project management SaaS that connects UI 
 | 3 | Learning login, opaque token, users/assignees, authorization base | AUTH | Completed |
 | 4 | Customer, property, project list/detail/create/update vertical slice | DATA, PRJ | Completed |
 | 5 | Search, filtering, sorting, pagination, cache policy | SEARCH, CACHE | Completed |
-| 6 | Multiple assignees, status service, optimistic locking, audit history | STATUS, AUDIT | Implemented and verified; review pending |
-| 7 | Project-level monthly/weekly Gantt | GANTT | Not implemented |
+| 6 | Multiple assignees, status service, optimistic locking, audit history | STATUS, AUDIT | Completed |
+| 7 | Project-level monthly/weekly Gantt | GANTT | Implemented and verified; review pending |
 | 8 | Kanban optimistic update, rollback, and conflict handling | KANBAN, CACHE | Not implemented |
 | 9 | Cross-layer tests, separately approved manual CI, documentation synchronization, learning map | TEST, ENV | Not implemented |
 
@@ -77,6 +77,5 @@ A phase is complete only when its mapped acceptance criteria pass, planned autom
 
 - Remaining post-Phase-4 domain field catalogs and validation limits
 - Archive reactivation rules and referential behavior
-- Gantt visible-range defaults and week-start convention
 - Audit retention and whether reasons are mandatory for selected actions
 - Whether the career material's broader "process/progress" wording requires data beyond project status and project date range; process/task-level Gantt remains out of scope

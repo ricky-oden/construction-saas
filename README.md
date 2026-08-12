@@ -4,7 +4,7 @@ Project ID: `CONSTRUCTION-V1`
 
 Plan version: `CONSTRUCTION-V1.0`
 
-Implementation status: Phase 6 workflow and audit slice implemented and verified; review pending
+Implementation status: Phase 7 project-level Gantt implemented and verified; review pending
 
 This repository is a learning implementation of a construction-industry project management SaaS. It is intended to make the work history described in the career material traceable from the browser through the API and ORM to PostgreSQL.
 
@@ -118,6 +118,8 @@ The Project list synchronizes submitted name/date conditions and immediately cha
 
 Project detail holds the current integer version. ADMIN/MANAGER can replace the assignee set, perform every approved status transition, update basic fields, and archive. MEMBER sees only permitted status actions for an assigned project. Every protected write requires `expected_version`; a stale request returns 409 conflict metadata, triggers a server-state refetch in the frontend, and changes neither business data nor audit history.
 
+The protected `/schedule` screen renders one date-precision bar per authorized Project. It defaults to the current Asia/Tokyo month, supports month and Monday-start week views, stores mode/anchor in the URL, uses inclusive date endpoints, clips overhanging bars, and keeps fixed day widths inside a horizontally scrollable table. Project bars link to Project detail. It reuses `GET /api/v1/projects` with the existing inclusive period overlap and MEMBER assignment scope; the backend never calculates pixels.
+
 ## Authentication security boundary
 
 Passwords are hashed with Argon2id. Login returns a random opaque token with an eight-hour lifetime; PostgreSQL stores only its SHA-256 hash. A partial unique index permits one unrevoked session per user; re-login revokes the previous row before creating the new session. Inactive users cannot log in or use an existing token.
@@ -161,4 +163,4 @@ Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanb
 
 ## Current boundary
 
-Phase 6 adds ProjectAssignee, approved status transitions, integer-version conflicts, assigned MEMBER scope, `assignee_id` search, and project audit history. It does not add Gantt, Kanban optimistic updates, Playwright, GitHub Actions workflow, or production deployment.
+Phase 7 adds the Project-level month/week Gantt and pure date/pixel geometry. It does not add process/task bars, holiday handling, Kanban optimistic updates, a repository Playwright suite, GitHub Actions workflow, or production deployment.

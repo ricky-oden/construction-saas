@@ -40,7 +40,7 @@ Normal initial design within an unmodified approved scope is not a `PROPOSED_CHA
 
 ## Current implementation gate
 
-Phases 1–5 are committed and pushed. Phase 6 multiple assignment, status transition, optimistic locking, MEMBER project scope, assignee search, and audit history are implemented and verified but remain unstaged and uncommitted pending review. Phase 7 and later work remains gated. Gantt, Kanban optimistic updates, GitHub Actions, Phase 6 staging/commit/push, PRs, and deployment require a later explicit instruction.
+Phases 1–6 are committed and pushed. Phase 7 project-level Gantt is implemented and verified but remains unstaged and uncommitted pending review. Phase 8 and later work remains gated. Kanban optimistic updates, GitHub Actions, Phase 7 staging/commit/push, PRs, and deployment require a later explicit instruction.
 
 ## Quiz mode
 

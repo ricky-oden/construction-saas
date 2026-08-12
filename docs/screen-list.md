@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Authentication, management screens, Phase 5 search, and the Phase 6 Project assignment/status/history UI are implemented. Gantt, Kanban, and a standalone Assignee screen remain `NOT_IMPLEMENTED`.
+Authentication, management, search, workflow/history, and the Phase 7 Gantt screen are implemented. Kanban and a standalone Assignee screen remain `NOT_IMPLEMENTED`.
 
 | ID | Route candidate | Screen | Main requirements | Roles |
 |---|---|---|---|---|
@@ -18,7 +18,7 @@ Authentication, management screens, Phase 5 search, and the Phase 6 Project assi
 | SCR-008A | `/properties/new` | Property registration | PRJ-003, DATA-002 | ADMIN, MANAGER — implemented |
 | SCR-009 | `/properties/[propertyId]` | Property detail/update | PRJ-003, DATA-002 | ADMIN, MANAGER — implemented |
 | SCR-010 | `/assignees` | Assignee management | DATA-003, PRJ-004, ARCH-001 | ADMIN, MANAGER |
-| SCR-011 | `/schedule` | Project Gantt | GANTT-001, GANTT-002, SEARCH-001 | ADMIN, MANAGER, MEMBER within scope |
+| SCR-011 | `/schedule` | Project Gantt | GANTT-001, GANTT-002, SEARCH-001 | ADMIN, MANAGER, assigned MEMBER — implemented |
 | SCR-012 | `/kanban` | Project Kanban | STATUS-001, STATUS-002, KANBAN-001, KANBAN-002 | ADMIN, MANAGER, MEMBER within scope |
 
 ## Shared screen behavior
@@ -45,6 +45,7 @@ Authentication, management screens, Phase 5 search, and the Phase 6 Project assi
 - Move the visible period backward and forward.
 - Include weekends and omit holiday-specific treatment.
 - Render project bars only; no process/task rows.
+- Restore `mode` and `anchor` from the URL, return to today, scroll horizontally, display status, and link bars to Project detail.
 
 ## Kanban screen
 
@@ -58,5 +59,4 @@ Authentication, management screens, Phase 5 search, and the Phase 6 Project assi
 - Whether create/edit is a full page or modal
 - Exact initial landing route
 - Default list page size/sort
-- Gantt initial range and week-start convention
 - Whether archived records use a separate page or a list filter

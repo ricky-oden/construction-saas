@@ -96,6 +96,15 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-056 | Record Project basic/date, status, assignment, and archive actions as AuditLog rows containing actor, JSONB before/after values, resulting Project version, and occurrence time in the same transaction as the business mutation. Return history chronologically. |
 | DEC-057 | Extend Project search and frontend URL/query-key state with `assignee_id`. On Phase 6 mutation settlement or 409, invalidate Project list/detail/history state and refetch the backend truth; Kanban optimistic cache mutation remains Phase 8. |
 
+## 2026-08-12 — Phase 7 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-058 | Use `/schedule` and reuse the authorized `GET /api/v1/projects` overlap query; add no duplicate Gantt endpoint and return no pixel coordinates. Follow pagination until every visible Project is loaded. |
+| DEC-059 | Use inclusive date endpoints, `Asia/Tokyo` for today's anchor, the current month as initial state, full calendar months, and Monday-through-Sunday weeks. Month/week navigation moves one month/seven days. |
+| DEC-060 | Keep intersection, clipping, inclusive duration, offset, and pixel geometry as DOM-independent frontend pure functions. Use fixed 40px month and 96px week date widths with horizontal overflow instead of viewport-dependent date math. |
+| DEC-061 | Persist `mode` and `anchor` in `/schedule` query state and key Gantt cache entries by visible bounds. Project mutations invalidate Gantt caches; Phase 8 Kanban optimism remains absent. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.
