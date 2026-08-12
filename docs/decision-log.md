@@ -105,6 +105,14 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-060 | Keep intersection, clipping, inclusive duration, offset, and pixel geometry as DOM-independent frontend pure functions. Use fixed 40px month and 96px week date widths with horizontal overflow instead of viewport-dependent date math. |
 | DEC-061 | Persist `mode` and `anchor` in `/schedule` query state and key Gantt cache entries by visible bounds. Project mutations invalidate Gantt caches; Phase 8 Kanban optimism remains absent. |
 
+## 2026-08-12 — Phase 8 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-062 | Use `/kanban`, the existing authorized paginated Project list, and `POST /projects/{project_id}/status-transitions`. Keep the canonical six-column order and explicit move buttons; add no drag-and-drop dependency, duplicate transition endpoint, backend rule, or migration. |
+| DEC-063 | Centralize the frontend transition candidates and optimistic mutation. `onMutate` cancels affected queries, snapshots all matching Kanban/list/detail/Gantt/history entries, and shape-checks each cache before changing Project status or status-filter membership. |
+| DEC-064 | Apply the authoritative status/version response on success; restore every snapshot for 401/403/409/422/network/5xx; then invalidate Kanban, all Project queries, Gantt, and Project history after both success and failure. Backend status, locked version, and AuditLog transaction remain the final truth. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.

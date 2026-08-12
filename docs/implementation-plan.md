@@ -32,8 +32,8 @@ Build a learning-oriented construction project management SaaS that connects UI 
 | 4 | Customer, property, project list/detail/create/update vertical slice | DATA, PRJ | Completed |
 | 5 | Search, filtering, sorting, pagination, cache policy | SEARCH, CACHE | Completed |
 | 6 | Multiple assignees, status service, optimistic locking, audit history | STATUS, AUDIT | Completed |
-| 7 | Project-level monthly/weekly Gantt | GANTT | Implemented and verified; review pending |
-| 8 | Kanban optimistic update, rollback, and conflict handling | KANBAN, CACHE | Not implemented |
+| 7 | Project-level monthly/weekly Gantt | GANTT | Completed |
+| 8 | Kanban optimistic update, rollback, and conflict handling | KANBAN, CACHE | Implemented and verified; review pending |
 | 9 | Cross-layer tests, separately approved manual CI, documentation synchronization, learning map | TEST, ENV | Not implemented |
 
 ## Dependency order

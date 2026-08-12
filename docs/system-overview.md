@@ -36,7 +36,9 @@ PostgreSQL 16.14 (Compose db:5432; no host port)
 ```
 
 Phase 5 extends this path with server-side Project filters, inclusive date overlap, fixed-column stable sorting, shared list pagination metadata, URL-restorable frontend conditions, and feature query-key/cache policy. Phase 6 adds assignee filtering, backend-enforced MEMBER assignment scope, locked versioned writes, approved status transitions, and transactional project audit history.
-Phase 7 reuses the authorized period-filtered Project endpoint for `/schedule`. The frontend owns Asia/Tokyo anchor selection, Monday-start visible weeks, inclusive clipping, fixed-column geometry, horizontal scrolling, and Project-detail navigation. The database and API remain date-only and contain no pixel coordinates. Kanban remains later-phase work.
+Phase 7 reuses the authorized period-filtered Project endpoint for `/schedule`. The frontend owns Asia/Tokyo anchor selection, Monday-start visible weeks, inclusive clipping, fixed-column geometry, horizontal scrolling, and Project-detail navigation. The database and API remain date-only and contain no pixel coordinates.
+
+Phase 8 reuses the authorized paginated Project list and Phase 6 transition endpoint for `/kanban`. A shared frontend mutation snapshots shape-checked Kanban, Project list/detail, Gantt, and history cache entries, applies immediate status placement, rolls every snapshot back on failure, and invalidates/refetches the backend truth after success and failure. FastAPI retains role/assignment/transition/version authority and commits status, version, and AuditLog together. No Phase 8 schema revision or duplicate endpoint exists.
 
 ## Local container topology
 

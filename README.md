@@ -4,7 +4,7 @@ Project ID: `CONSTRUCTION-V1`
 
 Plan version: `CONSTRUCTION-V1.0`
 
-Implementation status: Phase 7 project-level Gantt implemented and verified; review pending
+Implementation status: Phase 8 Kanban implemented and verified; review pending
 
 This repository is a learning implementation of a construction-industry project management SaaS. It is intended to make the work history described in the career material traceable from the browser through the API and ORM to PostgreSQL.
 
@@ -120,6 +120,8 @@ Project detail holds the current integer version. ADMIN/MANAGER can replace the 
 
 The protected `/schedule` screen renders one date-precision bar per authorized Project. It defaults to the current Asia/Tokyo month, supports month and Monday-start week views, stores mode/anchor in the URL, uses inclusive date endpoints, clips overhanging bars, and keeps fixed day widths inside a horizontally scrollable table. Project bars link to Project detail. It reuses `GET /api/v1/projects` with the existing inclusive period overlap and MEMBER assignment scope; the backend never calculates pixels.
 
+The protected `/kanban` screen loads every authorized, non-archived Project through the existing paginated list API and shows the six canonical status columns. Explicit move buttons expose only the role-appropriate transition candidates, but FastAPI remains authoritative. A shared TanStack Query mutation cancels affected queries, snapshots Kanban, Project list/detail, Gantt, and history caches, moves the card immediately, applies the server status/version on success, restores every snapshot on 401/403/409/422/network/5xx failure, and invalidates/refetches server state in `onSettled`. It reuses the Phase 6 status-transition API and adds no Kanban-specific write endpoint or migration.
+
 ## Authentication security boundary
 
 Passwords are hashed with Argon2id. Login returns a random opaque token with an eight-hour lifetime; PostgreSQL stores only its SHA-256 hash. A partial unique index permits one unrevoked session per user; re-login revokes the previous row before creating the new session. Inactive users cannot log in or use an existing token.
@@ -136,6 +138,8 @@ frontend/
   src/components/           app shell, common states/button, minimal form
   src/auth/                 token storage, AuthProvider, guards and roles
   src/business/             Customer/Property/Project API types and client
+  src/gantt/                pure date/range/pixel calculations and URL state
+  src/kanban/               transition policy, cache snapshots, optimistic mutation
   src/lib/api/              API client and shared error types
   src/providers/            TanStack Query provider
 backend/
@@ -163,4 +167,4 @@ Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanb
 
 ## Current boundary
 
-Phase 7 adds the Project-level month/week Gantt and pure date/pixel geometry. It does not add process/task bars, holiday handling, Kanban optimistic updates, a repository Playwright suite, GitHub Actions workflow, or production deployment.
+Phase 8 adds the six-column Project Kanban and optimistic status updates with complete rollback and server reconciliation. It does not add drag-and-drop dependencies, a duplicate status API, process/task bars, holiday handling, a repository Playwright suite, GitHub Actions workflow, or production deployment.

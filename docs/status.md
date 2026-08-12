@@ -2,16 +2,16 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Current phase: Phase 7 — Project-level monthly/weekly Gantt implemented and verified; review pending.
+Current phase: Phase 8 — Kanban optimistic update, rollback, and conflict handling implemented and verified; review pending.
 
 ## Product requirement status
 
-Phases 1–6 are committed and complete, and Phase 7 is implemented and verified in the unstaged worktree. Requirements spanning Kanban, the repository Playwright suite, and CI remain partial or not implemented.
+Phases 1–7 are committed and complete, and Phase 8 is implemented and verified in the unstaged worktree. Requirements spanning the repository Playwright suite and CI remain partial or not implemented.
 
 | Requirement group | Status | Verification |
 |---|---|---|
 | ENV | PARTIAL | Node/Python/PostgreSQL patches, lockfiles, dependency separation, Docker Compose, nonroot runtime, DB separation, and migration checks verified; CI remains Phase 9 |
-| UI | PARTIAL | Shared states/forms, URL-backed search, workflow/history controls, and Gantt states/navigation verified; Kanban UI remains |
+| UI | PARTIAL | Shared states/forms, URL-backed search, workflow/history controls, Gantt, and Kanban states/navigation verified; standalone Assignee management UI remains |
 | API | COMPLETE | Stable authentication, authorization, validation, not-found, duplicate/reference, 409 conflict, and safe server errors verified |
 | AUTH | COMPLETE | Role, assignment, operation, direct-API, and assigned MEMBER authorization verified in backend |
 | DATA | COMPLETE | Core cardinalities, constraints, Assignee/User link, and unique ProjectAssignee relation verified |
@@ -19,11 +19,11 @@ Phases 1–6 are committed and complete, and Phase 7 is implemented and verified
 | SEARCH | COMPLETE | Name/assignee/status/customer/property/period filters, fixed sorting, pagination, URL/query keys, and stale-result behavior verified |
 | STATUS | COMPLETE | Exact transition matrix, role/assignment rules, locked expected-version writes, increments, concurrent conflict, and 409 verified |
 | GANTT | COMPLETE | Month/week ranges, Monday week, Asia/Tokyo today, inclusive clipping, fixed pixel geometry, scroll, URL state, roles, status/detail links verified |
-| KANBAN | NOT_IMPLEMENTED | Not run |
-| CACHE | PARTIAL | Search/Gantt key separation plus Project/list/detail/history/Gantt invalidation and 409 refetch verified; Kanban cache behavior remains |
+| KANBAN | COMPLETE | Six ordered columns, authorized cards/actions, immediate movement, server version settlement, error rollback, conflict display, and refetch verified |
+| CACHE | COMPLETE | Parameterized query keys plus shape-checked Kanban/list/detail/Gantt/history snapshot, update, rollback, and settled invalidation verified |
 | AUDIT | COMPLETE | Basic-field/date/status/assignment/archive audit values, actor/version/time, authorized history, and transaction rollback verified |
 | ARCH | PARTIAL | is_active/is_archived lifecycle and default-list exclusion verified; final reactivation/reference policy remains unresolved |
-| TEST | PARTIAL | 65 frontend jsdom tests and 110 backend PostgreSQL tests passed; repository Playwright and Kanban suites remain |
+| TEST | PARTIAL | 82 frontend jsdom tests and 112 backend PostgreSQL tests passed; interactive browser smoke passed, but repository Playwright and CI remain Phase 9 |
 
 ## Documentation status
 
@@ -56,8 +56,8 @@ Phases 1–6 are committed and complete, and Phase 7 is implemented and verified
 
 ## Current gate
 
-- Phase 7 staging, commit, push, PR, and deployment require explicit follow-up approval.
-- Phase 8 Kanban and Phase 9 repository Playwright/CI work are not authorized.
+- Phase 8 staging, commit, push, PR, and deployment require explicit follow-up approval.
+- Phase 9 repository Playwright/CI work is not authorized.
 
 ## Phase 4 verification — 2026-08-12
 
@@ -114,4 +114,16 @@ Phases 1–6 are committed and complete, and Phase 7 is implemented and verified
 - Boundary coverage includes month end/crossing, year crossing, leap day, weekends, one-day projects, equal endpoints, both-side clipping, and fully outside projects.
 - 65 frontend jsdom tests and 110 backend PostgreSQL 16.14 tests passed. ESLint, Prettier, TypeScript, Ruff, Node.js 22.23.2 production build, Compose health, Alembic, same-origin API, and diff checks passed.
 - Interactive real-browser verification passed for demo ADMIN login → current-month Gantt → Project detail. No repository Playwright test was added.
-- Phase 8 Kanban, GitHub Actions, production deployment, process/task bars, holidays, and Phase 7 staging/commit/push remain absent.
+- GitHub Actions, production deployment, process/task bars, holidays, and repository Playwright remain absent.
+
+## Phase 8 verification — 2026-08-12
+
+- `/kanban` loads every authorized active-scope Project through the existing paginated list API, presents `DRAFT`, `PLANNED`, `IN_PROGRESS`, `ON_HOLD`, `COMPLETED`, and `CANCELLED` in fixed order, preserves stable backend ordering within columns, and links each card to Project detail.
+- Cards show status, inclusive date range, assignees, and version. Explicit move buttons use the shared approved transition matrix; MEMBER receives only assigned Projects from FastAPI and sees only the four approved transition edges.
+- The shared TanStack Query mutation cancels affected queries and snapshots Kanban, every Project list shape, Project detail, Gantt, and history. It performs the immediate move with the operation-start version, applies the backend response on success, fully restores snapshots for 401/403/409/422/network/5xx, displays categorized errors, and invalidates/refetches all affected families in `onSettled`.
+- No Kanban-specific write endpoint, duplicate backend transition rule, dependency, migration, or business table was added. The Phase 6 locked row/version, role/assignment checks, transition service, and status/AuditLog transaction remain authoritative.
+- 82 frontend jsdom tests passed in Node.js 22.23.2. Deferred requests cover pre-response movement, version settlement, double-operation prevention, rollback categories and rollback-before-401-auth-clear ordering, server-winner refetch, multiple Project-list cache consistency, Gantt status cache, history invalidation, loading/error/empty, and detail links.
+- 112 backend tests passed against isolated PostgreSQL 16.14. Added cases directly verify concurrent status transitions yield one success and one 409 without overwriting the winner, and forced audit insertion failure rolls back status, version, and history.
+- ESLint, Prettier check, TypeScript check, Ruff lint/format check, Node.js 22.23.2 production build, Compose config/build/health, development and test Alembic `current`/`check` at `20260812_03`, development `upgrade head`, and Next.js same-origin health passed.
+- Interactive browser smoke passed for MANAGER login → `/kanban` → `IN_PROGRESS → ON_HOLD` → version 5 and Project-detail `STATUS_CHANGED` history, followed by MEMBER assigned-only board/control verification. Forced browser failure and stale-409 injection were not run; deterministic frontend/backend tests cover them.
+- Final test commands reported no skip or xfail. One development-browser hydration warning from the existing AuthProvider initial localStorage-dependent state remains; production build and automated tests pass. No repository Playwright suite or GitHub Actions workflow exists.

@@ -6,8 +6,8 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 - Repository bootstrap: README and ignore rules only before this planning set
 - Approved plan documentation: `CONSTRUCTION-V1.0` initial baseline approved
-- Product implementation: Phases 1–6 committed; Phase 7 Project Gantt implemented and verified
-- Current gate: Phase 7 review pending; worktree remains unstaged and uncommitted
+- Product implementation: Phases 1–7 committed; Phase 8 Kanban implemented and verified
+- Current gate: Phase 8 review pending; worktree remains unstaged and uncommitted
 
 ## Phase gates
 
@@ -19,8 +19,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 | Phase 3 authentication approved | Login, token sessions, users/assignees, and authorization foundation pass | COMPLETED |
 | Core business slice verified | Customer/property/project constraints, CRUD, search, assignment, status/version, MEMBER scope, and audit pass | IMPLEMENTED_AND_VERIFIED |
 | Scheduling verified | Month/week Project Gantt date geometry, role scope, URL state, and browser detail flow pass | IMPLEMENTED_AND_VERIFIED |
-| Scheduling verified | Gantt date/pixel tests and browser flow pass | NOT_STARTED |
-| Workflow verified | Kanban success, rollback, 409, role tests pass | NOT_STARTED |
+| Workflow verified | Kanban success, rollback, 409, role tests pass | IMPLEMENTED_AND_VERIFIED |
 | Learning map complete | Browser-to-DB flow and important failure path documented | NOT_STARTED |
 
 ## Requirements
@@ -31,4 +30,4 @@ The separate non-Gantt meaning of the parent plan's process/progress wording rem
 
 ## Current prohibited actions
 
-Phase 8+ product implementation, GitHub Actions, Phase 7 staging/commit/push, PR, and deployment are not authorized.
+Phase 9 product implementation, GitHub Actions, Phase 8 staging/commit/push, PR, and deployment are not authorized.
