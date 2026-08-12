@@ -1,17 +1,17 @@
 from logging.config import fileConfig
 
-from sqlalchemy import MetaData
-
 from alembic import context
 from app.core.settings import get_settings
+from app.db.base import Base
 from app.db.session import get_engine
+from app.models import auth  # noqa: F401
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = MetaData()
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
