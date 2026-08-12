@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirement: TEST-001
 
-Status: `PARTIAL` — Phase 1–5 foundation, core vertical slice, and non-assignee search/cache coverage implemented; later assignment, concurrency, audit, and browser coverage remains.
+Status: `PARTIAL` — Phase 1–6 foundation, business workflows, PostgreSQL concurrency, and jsdom coverage implemented; real-browser and later Gantt/Kanban coverage remains.
 
 ## Principles
 
@@ -31,6 +31,8 @@ Phase 3 jsdom tests add token storage/restoration, Bearer attachment, 401 cleari
 Phase 4 jsdom tests add Customer list loading/error/empty states, management-role gating, retained form input after API failure, pending disabled text, and project date-range validation. These tests mock API calls and do not launch a browser.
 
 Phase 5 jsdom tests add URL restoration/normalization, submitted and immediate controls, reset and pagination navigation, all-condition query keys, stale-result suppression, loading/error/empty states, retained conditions on failure, cache invalidation, and bounded retry policy. API calls and Next.js navigation are mocked; no real browser is launched.
+
+Phase 6 jsdom tests add assignment-aware Project controls, exact MEMBER visibility, required version payloads, pending disabled state, structured 409 display, and Project/history cache refetch. API calls remain mocked; no real browser is launched.
 
 Later phases add:
 
@@ -83,15 +85,9 @@ Phase 4 additionally verifies with real PostgreSQL:
 
 Phase 5 backend tests cover individual and combined Project filters, case-insensitive name matching, status/customer/property selection, inclusive and one-sided period overlap, reversed periods, every fixed sort and both orders, stable ID ordering, pagination metadata/pages/limits, and 401/403. Customer and Property list pagination uses the same response contract.
 
-Later phases add:
+Phase 6 backend tests cover multiple/duplicate/inactive assignees, retained historical assignment, Assignee management, assigned MEMBER scope, all allowed ADMIN/MANAGER transitions, MEMBER allowed and prohibited transitions, terminal states, required/stale versions, concurrent writes, version increments, structured audit values, forced audit rollback, archive, and assignee search.
 
-- assigned-project and resource authorization
-- Assignee and project-assignment behavior
-- Multiple assignee uniqueness and replacement
-- Status transition service against the approved matrix
-- Integer-version increment and HTTP 409 conflict
-- Audit contents and mutation/audit atomicity
-- Business endpoint use of the Phase 1 common API error contract
+Later phases add Gantt and Kanban endpoint integration plus real-browser workflows.
 
 ## PostgreSQL integration
 
@@ -145,3 +141,5 @@ GitHub Actions is not part of Phase 2 and no workflow exists. When separately ap
 - Coverage thresholds
 
 Phase 4 migration checks include downgrade to the Phase 3 revision followed by `alembic upgrade head`, `alembic current`, and `alembic check` against the isolated test database.
+
+Phase 6 verification runs 107 pytest cases against PostgreSQL 16.14 and 46 frontend tests in jsdom. The isolated database migration was downgraded to `20260812_02`, upgraded to `20260812_03`, and passed `current` and `check`. The real-TCP same-origin smoke covers ADMIN assignment, assigned MEMBER list/detail, an approved transition, and history.

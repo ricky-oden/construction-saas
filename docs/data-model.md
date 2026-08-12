@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-`User`, `AuthTokenSession`, and `Assignee` were implemented in Phase 3. `Customer`, `Property`, and `Project` are implemented in Phase 4. Assignment, transition, version-conflict, and audit models remain later-phase work.
+`User`, `AuthTokenSession`, and the Assignee foundation were implemented in Phase 3; Customer, Property, and Project in Phase 4; and ProjectAssignee plus AuditLog in Phase 6. Version and transition rules are enforced by the Phase 6 service.
 
 ## Relationship overview
 
@@ -39,11 +39,11 @@ One project has exactly one customer and one property. A project cannot span mul
 
 A PostgreSQL partial unique index permits at most one unrevoked session per user. Re-login revokes the prior row and creates a new session, preserving evidence that the old raw token was invalidated; logout sets the current row's revoked timestamp.
 
-### Assignee — implemented foundation
+### Assignee — implemented
 
 - `id`
 - `user_id` unique relationship
-- display name; further business identity fields remain later-phase
+- display name
 - active/archive state
 - created/updated timestamps
 
@@ -84,26 +84,25 @@ A PostgreSQL partial unique index permits at most one unrevoked session per user
 - `is_archived`; defaults to `false`
 - created/updated timestamps
 
-`start_date <= end_date` is enforced in both application validation and PostgreSQL. A composite foreign key enforces that the selected property belongs to the selected customer. Phase 4 does not expose status transitions or version-conflict behavior.
+`start_date <= end_date` is enforced in both application validation and PostgreSQL. A composite foreign key enforces that the selected property belongs to the selected customer. Phase 6 locks protected writes, compares `expected_version`, increments the version once on success, and returns a structured 409 on mismatch.
 
-### ProjectAssignee
+### ProjectAssignee — implemented
 
 - `project_id`
 - `assignee_id`
-- assignment metadata to be finalized
 - assigned timestamp
 
 The project/assignee pair is unique. Primary-assignee or assignment-role concepts are not yet approved.
 
-### AuditLog
+### AuditLog — implemented
 
 - `id`
 - `project_id`
 - actor user ID
 - action/category
-- changed values or before/after representation
+- JSONB before and after values
 - occurred timestamp
-- project version and optional request correlation identifier
+- resulting project version
 
 ## Integrity rules
 

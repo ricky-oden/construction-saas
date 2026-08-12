@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirement: AUDIT-001
 
-Status: `NOT_IMPLEMENTED`
+Status: `IMPLEMENTED_AND_VERIFIED` for the initial Project scope
 
 ## Initial audit scope
 
@@ -17,17 +17,15 @@ Record changes to:
 
 Detailed field-by-field history for customers and properties is out of scope for `CONSTRUCTION-V1.0`.
 
-## Planned entry content
+## Entry content
 
 - Audit entry ID
 - Project ID
 - Category/action
 - Actor user ID
 - Occurred timestamp
-- Changed field names
-- Before and after values, or an equivalent structured diff
+- Structured JSONB `before_values` and `after_values`
 - Resulting project version
-- Optional request/correlation identifier
 
 Passwords, raw Bearer tokens, credential representations, and other secrets must never be recorded.
 
@@ -43,17 +41,15 @@ Assignment changes record the assignee identity and whether it was added or remo
 
 - History is read through the project history endpoint.
 - ADMIN and MANAGER can view in-scope project history.
-- MEMBER can view history only for an assigned project, subject to the final permission matrix.
-- Default order is chronological with the newest entry first unless the final API contract specifies otherwise.
+- MEMBER can view history only for an assigned project.
+- Entries are returned chronologically by occurrence time and ID.
 
 ## Archive interaction
 
-Archiving a project is a project-level lifecycle change and should be auditable when ARCH-001 is implemented. Detailed customer/property history remains excluded even when those records are archived.
+Archiving a project is recorded as a separate project action. Detailed customer/property history remains excluded even when those records are deactivated.
 
 ## Unresolved details
 
-- Exact structured-diff JSON shape
 - Retention period
 - Pagination size for history
 - Whether selected actions require a user-entered reason
-- Whether archive/reactivation is represented as basic information or a separate category

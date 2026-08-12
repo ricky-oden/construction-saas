@@ -2,28 +2,28 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Current phase: Phase 5 — search, pagination, and cache policy implemented and verified; review pending.
+Current phase: Phase 6 — assignment, transitions, optimistic locking, MEMBER scope, and audit implemented and verified; review pending.
 
 ## Product requirement status
 
-Phases 1–4 are complete and the Phase 5 non-assignee search/cache slice is implemented. Requirements spanning later phases remain partial or not implemented. No project assignment or assignee search, version conflict, status transition service, audit history, Gantt, Kanban, or CI workflow exists.
+Phases 1–5 are committed and complete, and Phase 6 is implemented and verified in the unstaged worktree. Requirements spanning Gantt, Kanban, Playwright, and CI remain partial or not implemented.
 
 | Requirement group | Status | Verification |
 |---|---|---|
 | ENV | PARTIAL | Node/Python/PostgreSQL patches, lockfiles, dependency separation, Docker Compose, nonroot runtime, DB separation, and migration checks verified; CI remains Phase 9 |
-| UI | PARTIAL | Shared states/forms plus URL-backed Project search and pagination are implemented; later assignment/Gantt/Kanban UI remains |
-| API | PARTIAL | Stable auth/validation/not-found/duplicate/reference/server errors verified; Phase 6 conflict metadata remains |
-| AUTH | PARTIAL | ADMIN/MANAGER business management and direct MEMBER 403 verified; MEMBER assigned-project scope waits for Phase 6 |
-| DATA | PARTIAL | Customer/Property/Project cardinality, date, unique code, and reference constraints verified; project assignment remains unimplemented |
-| PRJ | PARTIAL | Customer, Property, and Project list/create/detail/update verified; assignee management and multiple assignment remain |
-| SEARCH | PARTIAL | Name/status/customer/property/period filters, fixed sorting, and pagination implemented; assignee search waits for Phase 6 |
-| STATUS | NOT_IMPLEMENTED | Not run |
+| UI | PARTIAL | Shared states/forms, URL-backed search, assignment/status/history controls, pending state, and 409 reconciliation verified; Gantt/Kanban UI remains |
+| API | COMPLETE | Stable authentication, authorization, validation, not-found, duplicate/reference, 409 conflict, and safe server errors verified |
+| AUTH | COMPLETE | Role, assignment, operation, direct-API, and assigned MEMBER authorization verified in backend |
+| DATA | COMPLETE | Core cardinalities, constraints, Assignee/User link, and unique ProjectAssignee relation verified |
+| PRJ | PARTIAL | Project/Customer/Property flows and Project assignment UI verified; standalone Assignee management UI remains |
+| SEARCH | COMPLETE | Name/assignee/status/customer/property/period filters, fixed sorting, pagination, URL/query keys, and stale-result behavior verified |
+| STATUS | COMPLETE | Exact transition matrix, role/assignment rules, locked expected-version writes, increments, concurrent conflict, and 409 verified |
 | GANTT | NOT_IMPLEMENTED | Not run |
 | KANBAN | NOT_IMPLEMENTED | Not run |
-| CACHE | PARTIAL | Feature query-key factory, per-condition Project caches, mutation invalidation/detail updates, and bounded retry implemented; later Gantt/Kanban/history caches do not yet exist |
-| AUDIT | NOT_IMPLEMENTED | Not run |
+| CACHE | PARTIAL | Search-key separation plus Project/list/detail/history invalidation and 409 refetch verified; Gantt/Kanban cache behavior remains |
+| AUDIT | COMPLETE | Basic-field/date/status/assignment/archive audit values, actor/version/time, authorized history, and transaction rollback verified |
 | ARCH | PARTIAL | is_active/is_archived lifecycle and default-list exclusion verified; final reactivation/reference policy remains unresolved |
-| TEST | PARTIAL | 43 frontend jsdom tests and 68 backend PostgreSQL tests passed; real-browser and later business suites remain |
+| TEST | PARTIAL | 46 frontend jsdom tests and 107 backend PostgreSQL tests passed; Playwright and Gantt/Kanban suites remain |
 
 ## Documentation status
 
@@ -54,11 +54,10 @@ Phases 1–4 are complete and the Phase 5 non-assignee search/cache slice is imp
 - The backend production target does not contain pytest, Ruff, or the test HTTP client.
 - No baseline revision was created: Phase 2 has empty metadata and no business schema to migrate.
 
-## Prohibited until explicit follow-up approval
+## Current gate
 
-- Assignee search, project assignment, version conflicts, status transitions, audit, Gantt, or Kanban
-- GitHub Actions
-- Phase 5 commit, push, pull request, or deployment
+- Phase 6 staging, commit, push, PR, and deployment require explicit follow-up approval.
+- Phase 7 Gantt, Phase 8 Kanban, and Phase 9 Playwright/CI work are not authorized.
 
 ## Phase 4 verification — 2026-08-12
 
@@ -93,3 +92,16 @@ Phases 1–4 are complete and the Phase 5 non-assignee search/cache slice is imp
 - 68 backend tests passed against PostgreSQL 16.14, including each filter independently and both directions for all sort columns. Ruff lint and format check passed.
 - Alembic upgrade/current/check passed at `20260812_02`; Next.js same-origin login plus Project pagination and invalid-period validation passed over real TCP.
 - No Playwright suite was added or run; browser coverage remains part of the later TEST-001 work.
+
+## Phase 6 verification — 2026-08-12
+
+- ProjectAssignee enforces a unique Project/Assignee pair; inactive assignees are rejected for new assignment while retained historical references remain readable.
+- MEMBER list/detail/history and status operations are backend-restricted to assigned projects. Customer/Property/Assignee management, basic edits, assignment changes, archive, cancellation, and unassigned projects are denied.
+- All ten approved transitions passed for ADMIN and MANAGER; the four approved MEMBER transitions and representative prohibited/terminal transitions passed.
+- Basic update, assignment replacement, transition, and archive require `expected_version`, lock the Project row, increment once on success, and return structured 409 metadata on stale requests. A concurrent pair produced one success and one conflict.
+- Basic-field/date, status, assignment, and archive audits include actor, before/after JSON, resulting version, and occurrence time. Forced audit failure rolled back the business mutation in the same transaction.
+- `assignee_id` is included in backend search, frontend URL state, and every result-changing Project query key.
+- 107 backend tests passed against the isolated PostgreSQL 16.14 test DB; 46 frontend jsdom tests passed. Ruff, ESLint, Prettier, and TypeScript checks passed.
+- Alembic development and test DB checks passed at `20260812_03`; test DB downgrade to `20260812_02` and re-upgrade passed. Node.js 22.23.2 production build passed.
+- Next.js same-origin real-TCP smoke passed for ADMIN assignment, assigned MEMBER list/detail, `PLANNED → IN_PROGRESS`, and history.
+- No skip, xfail, warning, or TODO was reported by the final commands. Playwright, Gantt, Kanban, GitHub Actions, and production deployment were not run or implemented.

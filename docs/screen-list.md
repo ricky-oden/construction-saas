@@ -2,15 +2,15 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-The Phase 3 authentication screens and the Phase 4 Customer/Property/Project list, create, and detail/update screens are implemented. Search, assignment, Gantt, Kanban, and audit UI remain `NOT_IMPLEMENTED`.
+Authentication, management screens, Phase 5 search, and the Phase 6 Project assignment/status/history UI are implemented. Gantt, Kanban, and a standalone Assignee screen remain `NOT_IMPLEMENTED`.
 
 | ID | Route candidate | Screen | Main requirements | Roles |
 |---|---|---|---|---|
 | SCR-001 | `/login` | Login | AUTH-001 | Public — implemented |
 | INF-001 | `/account` | Protected authentication/role foundation | AUTH-001–003 | Authenticated — implemented |
-| SCR-002 | `/projects` | Project list/search/pagination | PRJ-001, SEARCH-001, CACHE-001 | ADMIN, MANAGER — implemented through Phase 5 |
+| SCR-002 | `/projects` | Project list/search/pagination | PRJ-001, SEARCH-001, CACHE-001 | ADMIN, MANAGER, assigned MEMBER — implemented through Phase 6 |
 | SCR-003 | `/projects/new` | Project registration | PRJ-001, DATA-001, DATA-002 | ADMIN, MANAGER — implemented |
-| SCR-004 | `/projects/[projectId]` | Project detail/update | PRJ-001, DATA-001, DATA-002 | ADMIN, MANAGER — implemented |
+| SCR-004 | `/projects/[projectId]` | Project detail, assignment, status, history | PRJ-001, PRJ-004, STATUS-001–002, AUDIT-001 | ADMIN, MANAGER, assigned MEMBER — implemented |
 | SCR-006 | `/customers` | Customer list | PRJ-002 | ADMIN, MANAGER — implemented |
 | SCR-006A | `/customers/new` | Customer registration | PRJ-002 | ADMIN, MANAGER — implemented |
 | SCR-007 | `/customers/[customerId]` | Customer detail/update | PRJ-002 | ADMIN, MANAGER — implemented |
@@ -30,14 +30,14 @@ The Phase 3 authentication screens and the Phase 4 Customer/Property/Project lis
 - Unified API errors distinguish authentication, authorization, validation, not found, version conflict, and server failure.
 - Major business records use archive/active operations rather than physical-delete UX.
 
-## Planned later project-detail sections
+## Project-detail sections
 
 - Basic information
 - Customer and property
 - Date range and status
-- Multiple assignees
-- Integer version metadata needed for protected updates
-- Project change history for AUDIT-001
+- Multiple assignees — implemented for ADMIN/MANAGER
+- Integer version metadata and 409 reconciliation — implemented
+- Project change history for AUDIT-001 — implemented
 
 ## Gantt screen
 
@@ -57,7 +57,6 @@ The Phase 3 authentication screens and the Phase 4 Customer/Property/Project lis
 
 - Whether create/edit is a full page or modal
 - Exact initial landing route
-- Exact MEMBER-editable fields and disabled-state messages
 - Default list page size/sort
 - Gantt initial range and week-start convention
 - Whether archived records use a separate page or a list filter

@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Phase 3 authentication and role-foundation behavior is implemented and verified. Project/resource authorization remains later-phase work.
+Phase 3 authentication and role foundations plus Phase 6 project/resource authorization are implemented and verified.
 
 ## Authentication flow
 
@@ -26,11 +26,11 @@ localStorage is approved only as a learning-oriented design. JavaScript on the s
 |---|---|---|---|
 | Project/customer/property/assignee management | All operations | Manage | No general management |
 | Read projects | All | All in system scope | Assigned projects only |
-| Update projects | All permitted transitions/fields | Manage subject to transition/version rules | Assigned projects, approved update range only |
+| Update projects | Basic fields and all permitted transitions | Basic fields and all permitted transitions | Assigned projects; approved transitions only |
 | Archive major data | Allowed | Allowed within managed resources | Not allowed |
 | View project history | Allowed | Allowed | Assigned project only |
 
-The exact MEMBER field and transition allowance is unresolved. Until approved, implementation must not infer that assignment grants unrestricted updates.
+MEMBER cannot edit project basic fields, assignees, archive state, Customer, Property, or Assignee data. Assignment grants read/history access and only these transitions: `PLANNED → IN_PROGRESS`, `IN_PROGRESS → ON_HOLD`, `ON_HOLD → IN_PROGRESS`, and `IN_PROGRESS → COMPLETED`.
 
 ## Authorization decision order
 
@@ -45,15 +45,21 @@ valid active token
 
 The backend is authoritative. Frontend route guards and hidden/disabled controls provide understandable UX but are not a security boundary.
 
-Phase 3 provides `require_roles(...)` for endpoint-level role checks. Missing/invalid authentication returns `AUTHENTICATION_REQUIRED` with 401; an authenticated user lacking the required role receives `FORBIDDEN` with 403. Assignment, resource, project status, and version checks remain unimplemented until their approved phases.
-
-Phase 4 applies the ADMIN/MANAGER dependency to every Customer, Property, and Project management endpoint. MEMBER receives 403 even through a direct API request. MEMBER assigned-project visibility is intentionally absent until project assignment is implemented in Phase 6.
+Phase 3 provides `require_roles(...)` for endpoint-level role checks. Missing/invalid authentication returns `AUTHENTICATION_REQUIRED` with 401; an authenticated user lacking the required role receives `FORBIDDEN` with 403. Phase 6 applies assignment scope in the Project service, so MEMBER list results contain assigned projects only and unassigned detail/history/actions return 403.
 
 ## Status service boundary
 
 All project status changes call a dedicated service that receives actor, project, target status, and expected version. It verifies authorization, the approved transition matrix, and version before updating status and writing AUDIT-001 in one transaction.
 
-The exact transition matrix for `DRAFT`, `PLANNED`, `IN_PROGRESS`, `ON_HOLD`, `COMPLETED`, and `CANCELLED` is intentionally unresolved rather than guessed.
+The implemented transition matrix is:
+
+- `DRAFT → PLANNED | CANCELLED`
+- `PLANNED → IN_PROGRESS | ON_HOLD | CANCELLED`
+- `IN_PROGRESS → ON_HOLD | COMPLETED | CANCELLED`
+- `ON_HOLD → IN_PROGRESS | CANCELLED`
+- `COMPLETED` and `CANCELLED` are terminal
+
+ADMIN and MANAGER may use every listed transition. MEMBER remains limited to the four assigned-project transitions stated above.
 
 ## Required tests
 

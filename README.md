@@ -4,7 +4,7 @@ Project ID: `CONSTRUCTION-V1`
 
 Plan version: `CONSTRUCTION-V1.0`
 
-Implementation status: Phase 4 Customer/Property/Project vertical slice implemented and verified
+Implementation status: Phase 6 workflow and audit slice implemented and verified; review pending
 
 This repository is a learning implementation of a construction-industry project management SaaS. It is intended to make the work history described in the career material traceable from the browser through the API and ORM to PostgreSQL.
 
@@ -101,7 +101,7 @@ docker compose exec -T \
 
 Tests reject a missing/invalid test URL or a database name that does not end in `_test`; they never fall back to the development DB.
 
-Alembic shares backend settings. Phase 3 adds the authentication-foundation revision and Phase 4 adds the Customer/Property/Project business-core revision:
+Alembic shares backend settings. Phase 3 adds authentication, Phase 4 adds the business core, and Phase 6 adds project assignment and audit history:
 
 ```bash
 docker compose exec -T backend alembic upgrade head
@@ -112,9 +112,11 @@ docker compose exec -T backend python -m app.db.seed
 
 The seed command is idempotent and uses the learning-only passwords from `.env`. Demo login IDs are `admin@example.com`, `manager@example.com`, `member@example.com`, and inactive `inactive@example.com`; their example passwords are documented only in `.env.example`. The login UI is at `http://localhost:3000/login`, and `/account` demonstrates protected-route, role-gate, and logout behavior.
 
-ADMIN and MANAGER can use the Phase 4 screens at `/customers`, `/properties`, and `/projects`, including their registration and detail/update routes. MEMBER receives 403 for these general-management APIs and screens; assigned-project access waits for the assignment implementation in Phase 6.
+ADMIN and MANAGER can manage customers, properties, projects, and assignees. MEMBER cannot use those general-management operations, but can list, open, and view history for assigned projects and perform only the approved assigned-project transitions.
 
-The Phase 5 Project list synchronizes submitted name/date conditions and immediately changed select/sort/page controls with the URL. It supports status, customer, property, inclusive date-overlap, fixed-column sorting, and pagination. Browser history and reload restore the URL-backed conditions. `assignee_id` search remains absent until ProjectAssignee is implemented in Phase 6.
+The Project list synchronizes submitted name/date conditions and immediately changed select/sort/page controls with the URL. It supports status, customer, property, assignee, inclusive date-overlap, fixed-column sorting, and pagination. Browser history and reload restore the URL-backed conditions. MEMBER results are additionally restricted by backend assignment scope.
+
+Project detail holds the current integer version. ADMIN/MANAGER can replace the assignee set, perform every approved status transition, update basic fields, and archive. MEMBER sees only permitted status actions for an assigned project. Every protected write requires `expected_version`; a stale request returns 409 conflict metadata, triggers a server-state refetch in the frontend, and changes neither business data nor audit history.
 
 ## Authentication security boundary
 
@@ -139,10 +141,10 @@ backend/
   app/core/                 settings
   app/db/                   lazy SQLAlchemy engine/session and test DB guard
   app/auth/                 password/token service and authorization dependencies
-  app/models/               Auth plus Customer, Property, and Project models
-  app/services/             Phase 4 reference/date/code validation and CRUD
-  alembic/                  Phase 3 auth and Phase 4 business-core revisions
-  tests/                    infrastructure, auth, roles, CRUD, constraints, seed
+  app/models/               Auth, business core, assignment, and audit models
+  app/services/             CRUD, search, assignment, transition, version, audit rules
+  alembic/                  Auth, business-core, and Phase 6 workflow revisions
+  tests/                    infrastructure through Phase 6 PostgreSQL workflows
 ```
 
 ## Documentation
@@ -159,4 +161,4 @@ Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanb
 
 ## Current boundary
 
-Phase 5 adds Project search/filter/sort/pagination and list/detail cache policy. It has no assignee search or project assignment, version-conflict handling, status transition service, audit history, Gantt, Kanban, GitHub Actions workflow, or production deployment.
+Phase 6 adds ProjectAssignee, approved status transitions, integer-version conflicts, assigned MEMBER scope, `assignee_id` search, and project audit history. It does not add Gantt, Kanban optimistic updates, Playwright, GitHub Actions workflow, or production deployment.

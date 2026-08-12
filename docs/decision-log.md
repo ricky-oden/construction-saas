@@ -85,6 +85,17 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-050 | Treat the URL query as the restorable Project-list state and include every result-changing normalized condition in the feature query-key factory. Do not retain prior-condition data while a new cache key loads. |
 | DEC-051 | On successful business mutations, update the affected detail cache and invalidate the resource's list-key family. Do not retry HTTP 4xx queries; bound other query retries and keep mutations non-retrying. |
 
+## 2026-08-12 — Phase 6 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-052 | Implement the explicitly approved ten-edge status matrix. `COMPLETED` and `CANCELLED` are terminal; all status writes pass through the backend transition service. |
+| DEC-053 | Restrict MEMBER to assigned Project list/detail/history and four transitions: `PLANNED → IN_PROGRESS`, `IN_PROGRESS → ON_HOLD`, `ON_HOLD → IN_PROGRESS`, and `IN_PROGRESS → COMPLETED`. MEMBER has no general management, assignment, archive, cancellation, or basic-edit permission. |
+| DEC-054 | Require `expected_version` for Project basic update, assignment replacement, status transition, and archive. Lock the row, compare the integer version, increment on success, and return HTTP 409 with resource type/ID and expected/current versions on mismatch. |
+| DEC-055 | Model ProjectAssignee with a unique Project/Assignee pair. Reject inactive assignees for new assignments while retaining historical references; only ADMIN/MANAGER replace the complete assignment set. |
+| DEC-056 | Record Project basic/date, status, assignment, and archive actions as AuditLog rows containing actor, JSONB before/after values, resulting Project version, and occurrence time in the same transaction as the business mutation. Return history chronologically. |
+| DEC-057 | Extend Project search and frontend URL/query-key state with `assignee_id`. On Phase 6 mutation settlement or 409, invalidate Project list/detail/history state and refetch the backend truth; Kanban optimistic cache mutation remains Phase 8. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.

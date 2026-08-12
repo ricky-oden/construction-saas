@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-The DB-backed health, Phase 3 authentication, and Phase 4 Customer/Property/Project management endpoints are implemented. Search, assignment, transition, audit, and other later-phase endpoints remain `NOT_IMPLEMENTED`.
+DB health, authentication, management, search, assignment, transition, conflict, and Project audit endpoints are implemented through Phase 6. Gantt and Kanban-specific APIs remain `NOT_IMPLEMENTED`.
 
 ## Common conventions
 
@@ -10,8 +10,8 @@ The DB-backed health, Phase 3 authentication, and Phase 4 Customer/Property/Proj
 - Protected requests: `Authorization: Bearer <opaque-token>`
 - JSON request and response bodies
 - Dates: ISO `YYYY-MM-DD`
-- From Phase 6, optimistically locked writes include expected integer `version`
-- From Phase 6, a stale version returns HTTP `409 Conflict`
+- Optimistically locked Project writes include required integer `expected_version`
+- A stale version returns HTTP `409 Conflict` without business or audit mutation
 - Authentication failure returns 401; authorization failure returns 403
 - Validation returns 422 with a consistent field/non-field error shape
 - Archived/inactive major records are excluded by default
@@ -49,13 +49,13 @@ Authentication failures use HTTP 401 and `AUTHENTICATION_REQUIRED` or `INVALID_C
 | GET | `/api/v1/projects` | Search/filter/sort/page non-archived projects | PRJ-001, SEARCH-001 |
 | POST | `/api/v1/projects` | Register project | PRJ-001, DATA-002 |
 | GET | `/api/v1/projects/{project_id}` | Get authorized project detail | PRJ-001 |
-| PATCH | `/api/v1/projects/{project_id}` | Update Phase 4 project fields | PRJ-001 |
+| PATCH | `/api/v1/projects/{project_id}` | Update basic fields with expected version | PRJ-001, STATUS-002, AUDIT-001 |
 | POST | `/api/v1/projects/{project_id}/archive` | Archive project | ARCH-001 |
 | PUT | `/api/v1/projects/{project_id}/assignees` | Replace/update assignment set with expected version | PRJ-004, STATUS-002, AUDIT-001 |
 | POST | `/api/v1/projects/{project_id}/status-transitions` | Request status transition with expected version | STATUS-001, STATUS-002, KANBAN-001 |
 | GET | `/api/v1/projects/{project_id}/history` | Get authorized project audit history | AUDIT-001 |
 
-The first four project endpoints are implemented for ADMIN and MANAGER. `PATCH` can update `is_archived`, but cannot write status or version. No DELETE endpoint exists. The archive, assignment, transition, and history endpoints in the table remain planned.
+All listed Project endpoints are implemented. ADMIN/MANAGER may create, edit basic fields, replace assignments, archive, and use every allowed transition. MEMBER list/detail/history/status calls are restricted to assigned projects and the approved four transitions. Status and archive are separate operations; no DELETE endpoint exists.
 
 Implemented Phase 5 list query parameters:
 
@@ -63,6 +63,7 @@ Implemented Phase 5 list query parameters:
 - `status`
 - `customer_id`
 - `property_id`
+- `assignee_id`
 - `period_from`
 - `period_to`
 - `sort`
@@ -70,7 +71,7 @@ Implemented Phase 5 list query parameters:
 - `page`
 - `page_size`
 
-`assignee_id` remains Phase 6 work and is rejected as an unknown query parameter. Name matching is case-insensitive substring matching. Period bounds use inclusive date overlap and may be supplied independently. `sort` is restricted to `code`, `name`, `start_date`, `end_date`, `created_at`, or `updated_at`; `order` is `asc` or `desc`. Defaults are `updated_at desc`, page 1, and page size 20; page size is capped at 100. Customer, Property, and Project list responses all include `items`, `page`, `page_size`, `total`, and `total_pages`.
+Name matching is case-insensitive substring matching. Period bounds use inclusive date overlap and may be supplied independently. `assignee_id` filters through the ProjectAssignee relation. `sort` is restricted to `code`, `name`, `start_date`, `end_date`, `created_at`, or `updated_at`; `order` is `asc` or `desc`. Defaults are `updated_at desc`, page 1, and page size 20; page size is capped at 100. Customer, Property, and Project list responses all include `items`, `page`, `page_size`, `total`, and `total_pages`.
 
 ## Customers
 
@@ -104,13 +105,14 @@ The first four property endpoints are implemented for ADMIN and MANAGER. `PATCH`
 | POST | `/api/v1/assignees` | Register assignee linked to login user | DATA-003, PRJ-004 |
 | GET | `/api/v1/assignees/{assignee_id}` | Get assignee | PRJ-004 |
 | PATCH | `/api/v1/assignees/{assignee_id}` | Update assignee | PRJ-004 |
-| POST | `/api/v1/assignees/{assignee_id}/archive` | Deactivate/archive assignee | ARCH-001 |
+
+These four Assignee management endpoints are implemented for ADMIN/MANAGER. `PATCH` changes display name or active state; no physical-delete endpoint exists.
 
 ## Authorization summary
 
 - ADMIN: all in-scope endpoints and operations
 - MANAGER: manage projects, customers, properties, and assignees
-- MEMBER: Phase 4 general Customer/Property/Project management endpoints return 403; assigned-project access remains unimplemented until assignment work in Phase 6
+- MEMBER: Customer/Property/Assignee management and Project create/basic-edit/assignment/archive return 403; assigned Project list/detail/history and four approved transitions are allowed
 - Backend checks apply even when the frontend hides a route or control
 
 ## Common error body
@@ -137,6 +139,6 @@ Phase 1 fixes the shared wire shape used by frontend and backend:
 - `code`: stable machine-readable application code
 - `message`: safe client-facing summary
 - `field_errors`: zero or more field/location errors
-- `conflict`: optional conflict metadata; exact 409 content remains a later-phase decision
+- `conflict`: null except for a stale Project version; then contains `resource_type`, `resource_id`, `expected_version`, and `current_version`
 
 404 and unexpected 500 responses use the same shape. Unexpected internal exception text is logged server-side and is not returned to the client.
