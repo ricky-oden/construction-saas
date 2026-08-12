@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirement: TEST-001
 
-Status: `PARTIAL` — Phase 1–7 foundation, workflows, Gantt geometry/UI, PostgreSQL, and jsdom coverage implemented; repository Playwright and later Kanban coverage remains.
+Status: `VERIFIED` — layered jsdom, PostgreSQL, saved Chromium E2E, and reproducible local verification completed.
 
 ## Principles
 
@@ -36,7 +36,7 @@ Phase 6 jsdom tests add assignment-aware Project controls, exact MEMBER visibili
 
 Phase 7 jsdom tests cover month/week/year/leap boundaries, Monday weeks, inclusive one-day width, intersection, both-side clipping, fixed geometry, URL restoration, mode/navigation controls, loading/error/empty, status, and detail links. The component API is mocked; pure functions do not use React or the DOM.
 
-Later phases add:
+Phase 8/9 add:
 
 - Gantt date-range intersection, clipping, and pixel geometry pure functions
 - Search parameter normalization and query-key construction
@@ -89,7 +89,7 @@ Phase 5 backend tests cover individual and combined Project filters, case-insens
 
 Phase 6 backend tests cover multiple/duplicate/inactive assignees, retained historical assignment, Assignee management, assigned MEMBER scope, all allowed ADMIN/MANAGER transitions, MEMBER allowed and prohibited transitions, terminal states, required/stale versions, concurrent writes, version increments, structured audit values, forced audit rollback, archive, and assignee search.
 
-Later phases add Kanban endpoint/cache integration and the repository Playwright suite.
+Phase 8 adds Kanban endpoint/cache integration; Phase 9 adds the saved repository Playwright suite.
 
 ## PostgreSQL integration
 
@@ -104,17 +104,22 @@ Use the Compose-profile `construction_saas_test` PostgreSQL database in tmpfs to
 
 SQLite-only verification is insufficient for these cases.
 
-## Playwright critical flows
+## Playwright critical-flow mapping
 
-1. Login, project list search, project detail.
-2. ADMIN or MANAGER registers and updates a project with customer/property validation.
-3. Combined project filters, sorting, and pagination.
-4. Month/week Gantt switch and visible-range navigation.
-5. Successful Kanban transition.
-6. Forced API failure restores the Kanban display.
-7. Forced version conflict shows 409 handling and reconciles server state.
-8. MEMBER can see an assigned project but not an unassigned project or prohibited controls.
-9. Multiple assignee change appears in project history.
+| Saved test in `frontend/e2e/critical-flows.spec.ts` | Directly verified flow |
+|---|---|
+| `login, project search/detail, logout, and hydration stay consistent` | Login, Project list search, Project detail, logout, protected-route redirect, and absence of hydration console errors |
+| `MANAGER registers and updates customer, property, and project through UI` | Customer create/update, Property create, Project create/update through real forms and APIs |
+| `combined filters, stable sorting, pagination, and URL restoration` | Combined name/date filtering, fixed sort/order, pagination, reload, and URL restoration |
+| `Gantt switches month/week, moves period, and links to detail` | Month/week switch, week range, next/previous period, and Project-detail navigation |
+| `Kanban success is optimistic and settles to the server version` | Pre-response optimistic move, successful transition, and authoritative version replacement |
+| `Kanban rolls optimistic state back on API failure` | Test-side intercepted 500, immediate move, complete rollback, error display, and original version restoration |
+| `stale Kanban version shows 409 and restores the server winner` | Real competing ADMIN update, stale 409, rollback/refetch, winner status, and winner version |
+| `MEMBER scope, API denial, and multiple-assignee history are enforced` | Multiple assignment and history, assigned-only MEMBER UI/API scope, unassigned 403, management 403, and prohibited transition/control |
+
+These eight tests cover all required browser flows; one test may cover multiple acceptance paths. Request interception is used only for the forced 500. The 409 winner and every normal operation use the real backend and test database.
+
+Screenshots are kept only on failure. Trace and video are disabled because browser network traces can retain Authorization headers. Playwright reports, screenshots, and test-result directories are Git-ignored; failures must not print credential values or response tokens.
 
 ## Traceability matrix
 
@@ -135,7 +140,7 @@ SQLite-only verification is insufficient for these cases.
 
 ## CI boundary
 
-GitHub Actions is not part of Phase 2 and no workflow exists. When separately approved in Phase 9, initial CI must follow the parent blueprint's `workflow_dispatch`-only rule until automatic triggers are explicitly approved.
+The approved Phase 9 workflow exists at `.github/workflows/manual-quality.yml`. It has only `workflow_dispatch`, calls `scripts/verify-phase9.sh`, and was checked statically. It has not been run on GitHub; automatic triggers remain prohibited.
 
 ## Unresolved test setup
 
@@ -149,3 +154,5 @@ Phase 6 verification runs 107 pytest cases against PostgreSQL 16.14 and 46 front
 Phase 7 verification runs 110 pytest cases against PostgreSQL 16.14 and 65 frontend tests in jsdom. Backend additions directly verify period overlap with MEMBER assignment scope and stable ADMIN/MANAGER ordering; frontend API coverage verifies all-page retrieval. An interactive real-browser smoke verified demo ADMIN login, initial Asia/Tokyo month Gantt, status/bar rendering, and navigation from the bar to Project detail; this was not a checked-in Playwright test suite.
 
 Phase 8 verification runs 112 pytest cases against PostgreSQL 16.14 and 82 frontend tests in jsdom. Deferred frontend requests directly verify pre-response card movement, double-operation prevention, authoritative version replacement, complete rollback for 401/403/409/422/network/5xx, rollback-before-401-auth-clear ordering, server-winner refetch, safe multi-cache updates, and settled invalidation of Project, Gantt, and history queries. Backend additions verify concurrent status transitions produce one winner/one 409 and forced AuditLog failure rolls back status and version. An interactive real-browser smoke verified MANAGER login, `/kanban`, `IN_PROGRESS → ON_HOLD`, version/history reflection, Project-detail navigation, and MEMBER assigned-only controls. Forced browser failure/409 was not injected; those paths are covered in Vitest and PostgreSQL pytest. No checked-in Playwright suite exists yet.
+
+Phase 9 verification runs 112 pytest cases against PostgreSQL 16.14, 86 Vitest/RTL tests in jsdom, and 8 saved Playwright Chromium tests against production Next.js, FastAPI, and the isolated PostgreSQL test DB. The complete local script additionally checks Alembic clean upgrade/current/check/downgrade/re-upgrade, lint/format/typecheck/build, seed idempotency, same-origin health, nonroot containers, and production dependency separation. No test is skipped or xfailed. The GitHub Actions remote run remains intentionally unexecuted.

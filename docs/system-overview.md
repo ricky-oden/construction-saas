@@ -40,6 +40,8 @@ Phase 7 reuses the authorized period-filtered Project endpoint for `/schedule`. 
 
 Phase 8 reuses the authorized paginated Project list and Phase 6 transition endpoint for `/kanban`. A shared frontend mutation snapshots shape-checked Kanban, Project list/detail, Gantt, and history cache entries, applies immediate status placement, rolls every snapshot back on failure, and invalidates/refetches the backend truth after success and failure. FastAPI retains role/assignment/transition/version authority and commits status, version, and AuditLog together. No Phase 8 schema revision or duplicate endpoint exists.
 
+Phase 9 adds no new domain layer. It completes the standalone Assignee screen, saved browser E2E, manual-only CI, and documentation traceability. `compose.e2e.yaml` builds the frontend production target with its internal rewrite fixed to `backend:8000`, removes source mounts, points the backend only to the tmpfs test database, and provides a version-matched Chromium runner. The development database service is not started and there is no fallback to it.
+
 ## Local container topology
 
 - `frontend`: Node.js 22.23.2, source mount plus named `node_modules` volume, nonroot `node` user.

@@ -6,8 +6,8 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 - Repository bootstrap: README and ignore rules only before this planning set
 - Approved plan documentation: `CONSTRUCTION-V1.0` initial baseline approved
-- Product implementation: Phases 1–7 committed; Phase 8 Kanban implemented and verified
-- Current gate: Phase 8 review pending; worktree remains unstaged and uncommitted
+- Product implementation: Phases 1–8 committed and pushed; Phase 9 implemented and locally verified
+- Current gate: Phase 9 review pending; Phase 9 worktree remains unstaged and uncommitted
 
 ## Phase gates
 
@@ -20,7 +20,9 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 | Core business slice verified | Customer/property/project constraints, CRUD, search, assignment, status/version, MEMBER scope, and audit pass | IMPLEMENTED_AND_VERIFIED |
 | Scheduling verified | Month/week Project Gantt date geometry, role scope, URL state, and browser detail flow pass | IMPLEMENTED_AND_VERIFIED |
 | Workflow verified | Kanban success, rollback, 409, role tests pass | IMPLEMENTED_AND_VERIFIED |
-| Learning map complete | Browser-to-DB flow and important failure path documented | NOT_STARTED |
+| Repository E2E verified | Saved Chromium flows run against production Next.js, FastAPI, and isolated PostgreSQL | IMPLEMENTED_AND_VERIFIED |
+| Manual CI structure verified | `workflow_dispatch` workflow matches the local verification command | STATICALLY_VERIFIED_REMOTE_NOT_RUN |
+| Learning map complete | Browser-to-DB flow, failure paths, and TEA/EC mappings documented | IMPLEMENTED_AND_VERIFIED |
 
 ## Requirements
 
@@ -30,4 +32,4 @@ The separate non-Gantt meaning of the parent plan's process/progress wording rem
 
 ## Current prohibited actions
 
-Phase 9 product implementation, GitHub Actions, Phase 8 staging/commit/push, PR, and deployment are not authorized.
+Phase 9 staging/commit/push, automatic GitHub Actions triggers, remote workflow execution, PR, and deployment are not authorized.

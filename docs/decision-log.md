@@ -113,6 +113,17 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-063 | Centralize the frontend transition candidates and optimistic mutation. `onMutate` cancels affected queries, snapshots all matching Kanban/list/detail/Gantt/history entries, and shape-checks each cache before changing Project status or status-filter membership. |
 | DEC-064 | Apply the authoritative status/version response on success; restore every snapshot for 401/403/409/422/network/5xx; then invalidate Kanban, all Project queries, Gantt, and Project history after both success and failure. Backend status, locked version, and AuditLog transaction remain the final truth. |
 
+## 2026-08-12 — Phase 9 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-065 | Keep AuthProvider's server and first client render at `loading`; inspect localStorage and restore `/auth/me` only after mount. This fixes hydration at its cause without suppression and prevents protected-content flash. |
+| DEC-066 | Pin `@playwright/test` 1.62.1 and use its version-matched official Chromium image. E2E runs through real Next.js/FastAPI/PostgreSQL test DB; request interception is limited to failure simulation and no backdoor API exists. |
+| DEC-067 | Complete the approved `/assignees` management screen with existing APIs and no User-management expansion. Existing User IDs are explicit learning inputs; updates use active state instead of deletion. |
+| DEC-068 | Add only `workflow_dispatch` CI with read-only contents permission, one bounded job, concurrency cancellation, no deploy/secrets/artifact requirement, and the same `scripts/verify-phase9.sh` command used locally. |
+| DEC-069 | Run E2E against the frontend production target, with `BACKEND_INTERNAL_URL=http://backend:8000` supplied as a build argument because Next.js materializes rewrites during build. Remove source mounts, start only tmpfs `test-db`, and keep the isolated host ports at 3010/8010. |
+| DEC-070 | Keep the eight-hour single-session rule in E2E: ordinary browser/API setup uses MANAGER, while the real competing 409 winner uses ADMIN so setup cannot revoke the browser's token. Use request interception only for the explicit 500 rollback case. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.

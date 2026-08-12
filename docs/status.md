@@ -2,28 +2,28 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Current phase: Phase 8 — Kanban optimistic update, rollback, and conflict handling implemented and verified; review pending.
+Current phase: Phase 9 — cross-layer E2E, manual CI, hydration correction, traceability, and learning documentation implemented and locally verified; review pending.
 
 ## Product requirement status
 
-Phases 1–7 are committed and complete, and Phase 8 is implemented and verified in the unstaged worktree. Requirements spanning the repository Playwright suite and CI remain partial or not implemented.
+Phases 1–8 are committed and pushed. Phase 9 is implemented and locally verified in the unstaged worktree. The manual GitHub Actions workflow is statically verified but has not been run remotely.
 
 | Requirement group | Status | Verification |
 |---|---|---|
-| ENV | PARTIAL | Node/Python/PostgreSQL patches, lockfiles, dependency separation, Docker Compose, nonroot runtime, DB separation, and migration checks verified; CI remains Phase 9 |
-| UI | PARTIAL | Shared states/forms, URL-backed search, workflow/history controls, Gantt, and Kanban states/navigation verified; standalone Assignee management UI remains |
+| ENV | COMPLETE | Fixed runtimes, lockfiles, dependency separation, Compose, nonroot runtime, DB separation, migration/build checks, reproducible script, and manual-only workflow structure verified locally |
+| UI | COMPLETE | Shared states/forms, URL-backed search, workflow/history controls, Gantt, Kanban, hydration-safe auth restoration, and standalone Assignee management verified |
 | API | COMPLETE | Stable authentication, authorization, validation, not-found, duplicate/reference, 409 conflict, and safe server errors verified |
 | AUTH | COMPLETE | Role, assignment, operation, direct-API, and assigned MEMBER authorization verified in backend |
 | DATA | COMPLETE | Core cardinalities, constraints, Assignee/User link, and unique ProjectAssignee relation verified |
-| PRJ | PARTIAL | Project/Customer/Property flows and Project assignment UI verified; standalone Assignee management UI remains |
+| PRJ | COMPLETE | Project/Customer/Property/Assignee management and multiple-assignment workflow verified through API, component, PostgreSQL, and browser tests |
 | SEARCH | COMPLETE | Name/assignee/status/customer/property/period filters, fixed sorting, pagination, URL/query keys, and stale-result behavior verified |
 | STATUS | COMPLETE | Exact transition matrix, role/assignment rules, locked expected-version writes, increments, concurrent conflict, and 409 verified |
 | GANTT | COMPLETE | Month/week ranges, Monday week, Asia/Tokyo today, inclusive clipping, fixed pixel geometry, scroll, URL state, roles, status/detail links verified |
 | KANBAN | COMPLETE | Six ordered columns, authorized cards/actions, immediate movement, server version settlement, error rollback, conflict display, and refetch verified |
 | CACHE | COMPLETE | Parameterized query keys plus shape-checked Kanban/list/detail/Gantt/history snapshot, update, rollback, and settled invalidation verified |
 | AUDIT | COMPLETE | Basic-field/date/status/assignment/archive audit values, actor/version/time, authorized history, and transaction rollback verified |
-| ARCH | PARTIAL | is_active/is_archived lifecycle and default-list exclusion verified; final reactivation/reference policy remains unresolved |
-| TEST | PARTIAL | 82 frontend jsdom tests and 112 backend PostgreSQL tests passed; interactive browser smoke passed, but repository Playwright and CI remain Phase 9 |
+| ARCH | COMPLETE | `is_active`/`is_archived`, no physical-delete API, default exclusion, inactive-reference preservation, and assignment history behavior verified within approved rules |
+| TEST | COMPLETE | 86 frontend jsdom tests, 112 backend PostgreSQL tests, and 8 saved Chromium E2E tests passed; manual workflow is statically verified and remote-unexecuted |
 
 ## Documentation status
 
@@ -56,8 +56,7 @@ Phases 1–7 are committed and complete, and Phase 8 is implemented and verified
 
 ## Current gate
 
-- Phase 8 staging, commit, push, PR, and deployment require explicit follow-up approval.
-- Phase 9 repository Playwright/CI work is not authorized.
+- Phase 9 staging, commit, push, PR, deployment, remote workflow execution, and automatic GitHub Actions triggers require explicit follow-up approval.
 
 ## Phase 4 verification — 2026-08-12
 
@@ -127,3 +126,14 @@ Phases 1–7 are committed and complete, and Phase 8 is implemented and verified
 - ESLint, Prettier check, TypeScript check, Ruff lint/format check, Node.js 22.23.2 production build, Compose config/build/health, development and test Alembic `current`/`check` at `20260812_03`, development `upgrade head`, and Next.js same-origin health passed.
 - Interactive browser smoke passed for MANAGER login → `/kanban` → `IN_PROGRESS → ON_HOLD` → version 5 and Project-detail `STATUS_CHANGED` history, followed by MEMBER assigned-only board/control verification. Forced browser failure and stale-409 injection were not run; deterministic frontend/backend tests cover them.
 - Final test commands reported no skip or xfail. One development-browser hydration warning from the existing AuthProvider initial localStorage-dependent state remains; production build and automated tests pass. No repository Playwright suite or GitHub Actions workflow exists.
+
+## Phase 9 verification — 2026-08-12
+
+- AuthProvider now renders the same explicit loading state on the server and first client render, restores localStorage authentication only after mount, and protects routes until restoration completes. Vitest hydration and Chromium console checks found no hydration warning.
+- `/assignees` provides ADMIN/MANAGER registration and display-name/active-state update using the existing APIs; create payloads for Customer/Property omit update-only `is_active` fields.
+- The saved Playwright suite ran 8/8 Chromium tests against the Node.js 22 production Next.js target, same-origin rewrite, real FastAPI, SQLAlchemy, and isolated PostgreSQL 16.14 test DB. It covers login/search/detail/logout, management CRUD, URL search controls, Gantt, Kanban success/rollback/409, MEMBER scope/direct API denial, and assignment history.
+- `scripts/verify-phase9.sh` passed from a clean isolated Compose project: Alembic downgrade-to-base/full-upgrade/current/check/downgrade/re-upgrade; 112 pytest; Ruff lint/format; 86 Vitest; ESLint; Prettier; TypeScript; Node.js 22 production build; seed twice; 8 Playwright; same-origin health; nonroot users; and production backend dependency separation.
+- The E2E frontend uses the production target with a build-time internal rewrite to `backend:8000`, no source mount, and no development-DB dependency. The backend points only to tmpfs `test-db`; cleanup removed the isolated project and its temporary resources.
+- The normal development Compose config/build/up/health passed for frontend, backend, db, and test-db. Direct and same-origin health returned `status=ok,database=ok`; backend connected to `db:5432/construction_saas` as `construction_app`; Alembic was `20260812_03 (head)` with no differences. Services were then stopped while retaining the development named volume.
+- `.github/workflows/manual-quality.yml` is `workflow_dispatch` only, read-only, concurrent/cancelable, time-bounded, secret-free, non-deploying, and calls the same local script. Its structure and commands were statically verified; no remote workflow run occurred.
+- Final automated commands reported no skipped or xfailed tests. Informational npm notices reported that a newer npm major exists; the version-matched Playwright image uses its bundled Node 24 internally, while application production build/runtime remains fixed to Node.js 22.23.2.

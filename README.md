@@ -4,7 +4,7 @@ Project ID: `CONSTRUCTION-V1`
 
 Plan version: `CONSTRUCTION-V1.0`
 
-Implementation status: Phase 8 Kanban implemented and verified; review pending
+Implementation status: Phase 9 implemented and locally verified; review/commit approval pending
 
 This repository is a learning implementation of a construction-industry project management SaaS. It is intended to make the work history described in the career material traceable from the browser through the API and ORM to PostgreSQL.
 
@@ -25,7 +25,7 @@ This repository is a learning implementation of a construction-industry project 
 - Database: PostgreSQL 16
 - Tests: Vitest, React Testing Library, Playwright, pytest
 - Environment: Docker Compose, npm
-- Planned CI after separate approval: GitHub Actions
+- CI: GitHub Actions manual `workflow_dispatch` only (structure locally verified; remote run not performed)
 
 The project uses Node.js `22.23.2`, npm `10.9.8`, Python `3.12.13`, and PostgreSQL `16.14`. Frontend direct dependencies are fixed in `frontend/package.json`, the complete npm graph is fixed in `frontend/package-lock.json`, and backend packages are fixed in separate runtime and development/test requirement files.
 
@@ -38,6 +38,7 @@ cd frontend
 npm ci
 npm run dev
 npm test
+npm run test:e2e
 npm run lint
 npm run format
 npm run format:check
@@ -45,7 +46,7 @@ npm run typecheck
 npm run build
 ```
 
-The development server uses `http://localhost:3000` by default. Phase 1 verification ran every command above successfully. The automated tests use jsdom and React Testing Library; they do not use a real browser.
+The development server uses `http://localhost:3000` by default. `npm test` uses jsdom and React Testing Library; `npm run test:e2e` uses saved Playwright tests and requires the documented E2E Compose stack rather than the standalone development server.
 
 ## Backend commands
 
@@ -122,6 +123,21 @@ The protected `/schedule` screen renders one date-precision bar per authorized P
 
 The protected `/kanban` screen loads every authorized, non-archived Project through the existing paginated list API and shows the six canonical status columns. Explicit move buttons expose only the role-appropriate transition candidates, but FastAPI remains authoritative. A shared TanStack Query mutation cancels affected queries, snapshots Kanban, Project list/detail, Gantt, and history caches, moves the card immediately, applies the server status/version on success, restores every snapshot on 401/403/409/422/network/5xx failure, and invalidates/refetches server state in `onSettled`. It reuses the Phase 6 status-transition API and adds no Kanban-specific write endpoint or migration.
 
+The protected `/assignees` screen completes the approved standalone management path. ADMIN/MANAGER can register an Assignee for an existing User ID and update display name/active state; physical deletion is not offered.
+
+## Reproducible full verification
+
+Copy the learning-only environment and run the Phase 9 command from the repository root:
+
+```bash
+cp .env.example .env
+scripts/verify-phase9.sh
+```
+
+The script uses the separate Compose project `construction-project-saas-e2e`, binds its frontend/backend to host ports 3010/8010, points the backend exclusively at the tmpfs `_test` database, rebuilds/migrates/tests/seeds it, runs Vitest/pytest/Playwright and quality/build checks, and removes only that isolated project's volumes on exit. Playwright runs Chromium from the version-matched official image. Screenshots are retained only on failure; trace and video are disabled so failure artifacts do not persist Bearer headers. Generated reports are ignored by Git.
+
+The verified local result is 112 pytest tests against PostgreSQL 16.14, 86 Vitest/RTL tests, and 8 Playwright Chromium tests. The same script is referenced by `.github/workflows/manual-quality.yml`. That workflow has only a manual trigger and has been statically inspected; it has not been run remotely.
+
 ## Authentication security boundary
 
 Passwords are hashed with Argon2id. Login returns a random opaque token with an eight-hour lifetime; PostgreSQL stores only its SHA-256 hash. A partial unique index permits one unrevoked session per user; re-login revokes the previous row before creating the new session. Inactive users cannot log in or use an existing token.
@@ -140,6 +156,7 @@ frontend/
   src/business/             Customer/Property/Project API types and client
   src/gantt/                pure date/range/pixel calculations and URL state
   src/kanban/               transition policy, cache snapshots, optimistic mutation
+  e2e/                      saved Chromium critical flows against the real stack
   src/lib/api/              API client and shared error types
   src/providers/            TanStack Query provider
 backend/
@@ -163,8 +180,8 @@ Start with:
 - `docs/status.md`
 - `docs/decision-log.md`
 
-Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanban cache handling, audit logs, and tests.
+Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanban cache handling, audit logs, tests, requirements traceability, code reading, and the learning map.
 
 ## Current boundary
 
-Phase 8 adds the six-column Project Kanban and optimistic status updates with complete rollback and server reconciliation. It does not add drag-and-drop dependencies, a duplicate status API, process/task bars, holiday handling, a repository Playwright suite, GitHub Actions workflow, or production deployment.
+Phase 9 adds saved Playwright E2E, a manual-only quality workflow, Assignee management UI, hydration-safe authentication restoration, and final learning/traceability documents. Local verification is complete; Phase 9 remains unstaged and uncommitted pending review. It adds no new large business feature, automatic CI trigger, deployment, or external paid service.

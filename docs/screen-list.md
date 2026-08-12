@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Authentication, management, search, workflow/history, and the Phase 7 Gantt screen are implemented. Kanban and a standalone Assignee screen remain `NOT_IMPLEMENTED`.
+Authentication, management, search, workflow/history, Gantt, Kanban, and standalone Assignee management are implemented.
 
 | ID | Route candidate | Screen | Main requirements | Roles |
 |---|---|---|---|---|
@@ -17,9 +17,9 @@ Authentication, management, search, workflow/history, and the Phase 7 Gantt scre
 | SCR-008 | `/properties` | Property list | PRJ-003, DATA-002 | ADMIN, MANAGER — implemented |
 | SCR-008A | `/properties/new` | Property registration | PRJ-003, DATA-002 | ADMIN, MANAGER — implemented |
 | SCR-009 | `/properties/[propertyId]` | Property detail/update | PRJ-003, DATA-002 | ADMIN, MANAGER — implemented |
-| SCR-010 | `/assignees` | Assignee management | DATA-003, PRJ-004, ARCH-001 | ADMIN, MANAGER |
+| SCR-010 | `/assignees` | Assignee management | DATA-003, PRJ-004, ARCH-001 | ADMIN, MANAGER — implemented |
 | SCR-011 | `/schedule` | Project Gantt | GANTT-001, GANTT-002, SEARCH-001 | ADMIN, MANAGER, assigned MEMBER — implemented |
-| SCR-012 | `/kanban` | Project Kanban | STATUS-001, STATUS-002, KANBAN-001, KANBAN-002 | ADMIN, MANAGER, MEMBER within scope |
+| SCR-012 | `/kanban` | Project Kanban | STATUS-001, STATUS-002, KANBAN-001, KANBAN-002 | ADMIN, MANAGER, MEMBER within scope — implemented |
 
 ## Shared screen behavior
 

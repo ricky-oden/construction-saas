@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-DB health, authentication, management, search, assignment, transition, conflict, Project audit, and the Phase 7 Gantt data path are implemented. Kanban-specific APIs remain `NOT_IMPLEMENTED`.
+DB health, authentication, management, search, assignment, transition, conflict, Project audit, Gantt, and Kanban data paths are implemented. Kanban deliberately reuses the Project list and status-transition APIs; no duplicate Kanban API exists.
 
 ## Common conventions
 
