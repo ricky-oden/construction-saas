@@ -350,6 +350,33 @@ def test_concurrent_updates_allow_only_one_expected_version(db_session: Session)
     assert sorted(statuses) == [200, 409]
 
 
+def test_concurrent_status_transitions_keep_only_the_server_winner(
+    db_session: Session,
+) -> None:
+    client, project, _, _ = setup_project(db_session)
+    token = client.headers["Authorization"]
+
+    def transition(target: str) -> tuple[int, dict[str, object]]:
+        with TestClient(create_app(), headers={"Authorization": token}) as concurrent_client:
+            response = concurrent_client.post(
+                f"/api/v1/projects/{project['id']}/status-transitions",
+                json={"expected_version": 1, "status": target},
+            )
+            return response.status_code, response.json()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        responses = list(executor.map(transition, ["PLANNED", "CANCELLED"]))
+
+    assert sorted(status for status, _body in responses) == [200, 409]
+    winner = next(body for status, body in responses if status == 200)
+    conflict = next(body for status, body in responses if status == 409)
+    detail = client.get(f"/api/v1/projects/{project['id']}").json()
+    assert detail["status"] == winner["status"]
+    assert detail["version"] == 2
+    assert conflict["error"]["conflict"]["current_version"] == 2
+    assert db_session.scalar(select(func.count()).select_from(AuditLog)) == 1
+
+
 def test_audit_contents_and_archive_version_increment(db_session: Session) -> None:
     client, project, first, second = setup_project(db_session)
     assigned = assign(client, int(project["id"]), 1, [first.id, second.id])
@@ -394,6 +421,29 @@ def test_forced_audit_exception_rolls_back_business_update(
     db_session.expire_all()
     persisted = db_session.get(Project, int(project["id"]))
     assert persisted and persisted.name == "Workflow Project" and persisted.version == 1
+    assert db_session.scalar(select(func.count()).select_from(AuditLog)) == 0
+
+
+def test_forced_audit_exception_rolls_back_status_version_and_history(
+    db_session: Session, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    client, project, _, _ = setup_project(db_session)
+
+    def fail_audit(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("forced status audit failure")
+
+    monkeypatch.setattr("app.services.business._audit", fail_audit)
+    with TestClient(create_app(), raise_server_exceptions=False) as failure_client:
+        failure_client.headers.update(client.headers)
+        response = failure_client.post(
+            f"/api/v1/projects/{project['id']}/status-transitions",
+            json={"expected_version": 1, "status": "PLANNED"},
+        )
+    assert response.status_code == 500
+    db_session.expire_all()
+    persisted = db_session.get(Project, int(project["id"]))
+    assert persisted and persisted.status == ProjectStatus.DRAFT
+    assert persisted.version == 1
     assert db_session.scalar(select(func.count()).select_from(AuditLog)) == 0
 
 
