@@ -19,6 +19,30 @@
     sans-serif;
 }
 
+.narrow-page {
+  width: min(100%, 42rem);
+  margin-inline: auto;
+}
+
+.form-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-stack label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 650;
+}
+
+.form-stack input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font: inherit;
+}
+
 * {
   box-sizing: border-box;
 }
