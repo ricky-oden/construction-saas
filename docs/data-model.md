@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-All models are planned and `NOT_IMPLEMENTED`.
+`User`, `AuthTokenSession`, and `Assignee` are implemented in Phase 3. All business models remain planned and `NOT_IMPLEMENTED`.
 
 ## Relationship overview
 
@@ -11,8 +11,8 @@ Customer 1 --- * Property
 Customer 1 --- * Project
 Property 1 --- * Project
 Project 1 --- * ProjectAssignee * --- 1 Assignee
-User 1 --- 1 Assignee
-User 1 --- * AuthToken
+User 1 --- 0..1 Assignee
+User 1 --- * AuthTokenSession (at most one unrevoked)
 Project 1 --- * AuditLog
 ```
 
@@ -20,30 +20,30 @@ One project has exactly one customer and one property. A project cannot span mul
 
 ## Planned entities
 
-### User
+### User — implemented
 
 - `id`
-- login identifier and password representation
+- unique normalized email and Argon2id password hash
 - `role`: `ADMIN | MANAGER | MEMBER`
 - active/archive state
 - created/updated timestamps
 
-### AuthToken
+### AuthTokenSession — implemented
 
 - `id`
 - `user_id`
-- server-side opaque-token representation
+- SHA-256 hash of the opaque token; raw token is never persisted
 - issued timestamp
-- expiration timestamp if a lifetime is approved
+- issued timestamp and eight-hour expiration timestamp
 - revoked timestamp
 
-The implementation should avoid storing a directly reusable raw token when a one-way token hash can satisfy server-side persistence and lookup. The exact representation is finalized with AUTH-001 implementation; the token session itself remains stored in PostgreSQL.
+A PostgreSQL partial unique index permits at most one unrevoked session per user. Re-login revokes the prior row and creates a new session, preserving evidence that the old raw token was invalidated; logout sets the current row's revoked timestamp.
 
-### Assignee
+### Assignee — implemented foundation
 
 - `id`
 - `user_id` unique relationship
-- display and business identity fields to be finalized
+- display name; further business identity fields remain later-phase
 - active/archive state
 - created/updated timestamps
 

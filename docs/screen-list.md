@@ -2,11 +2,12 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-All screens are `NOT_IMPLEMENTED`.
+The Phase 3 login and authentication-foundation account screen are implemented. Business screens remain `NOT_IMPLEMENTED`.
 
 | ID | Route candidate | Screen | Main requirements | Roles |
 |---|---|---|---|---|
-| SCR-001 | `/login` | Login | AUTH-001 | Public |
+| SCR-001 | `/login` | Login | AUTH-001 | Public — implemented |
+| INF-001 | `/account` | Protected authentication/role foundation | AUTH-001–003 | Authenticated — implemented |
 | SCR-002 | `/projects` | Project list | PRJ-001, SEARCH-001, CACHE-001 | ADMIN, MANAGER, MEMBER within scope |
 | SCR-003 | `/projects/new` | Project registration | PRJ-001, DATA-001, DATA-002 | ADMIN, MANAGER |
 | SCR-004 | `/projects/[id]` | Project detail | PRJ-001, PRJ-004, AUDIT-001 | ADMIN, MANAGER, assigned MEMBER |

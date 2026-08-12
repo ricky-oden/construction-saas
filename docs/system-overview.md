@@ -35,7 +35,7 @@ PostgreSQL 16.14 (Compose db:5432; no host port)
   - business data, token sessions, constraints, versions, audit logs
 ```
 
-Phase 2 provides this path only through DB-backed health; authentication and all business routes shown as responsibilities remain later-phase work.
+Phase 3 provides this path through DB-backed health and authentication routes. Customer/property/project routes and all project-specific responsibilities remain later-phase work.
 
 ## Local container topology
 
@@ -45,6 +45,20 @@ Phase 2 provides this path only through DB-backed health; authentication and all
 - `test-db`: profile-only `construction_saas_test` database in tmpfs.
 
 The backend lazily creates its SQLAlchemy engine/session factory from `DATABASE_URL` with pool pre-ping. Alembic reads the same settings. Importing the FastAPI application does not itself open a database connection. The health dependency executes `SELECT 1`; SQLAlchemy failures use the common safe 503 error envelope.
+
+## Phase 3 authentication path
+
+```text
+login form -> Next.js /api/v1 rewrite -> FastAPI auth service
+  -> normalized User email + Argon2id verification
+  -> random raw token returned to browser localStorage
+  -> SHA-256 token hash + eight-hour expiry stored in PostgreSQL
+
+protected request -> Bearer token -> SHA-256 lookup
+  -> active session + expiry + active user -> role dependency -> endpoint
+```
+
+Frontend protection and role gates are presentation controls. FastAPI dependencies remain the security boundary and distinguish unauthenticated 401 from unauthorized 403.
 
 ## Initial vertical slice
 

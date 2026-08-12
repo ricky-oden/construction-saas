@@ -4,7 +4,7 @@ Project ID: `CONSTRUCTION-V1`
 
 Plan version: `CONSTRUCTION-V1.0`
 
-Implementation status: Phase 2 local container and database foundation implemented and verified
+Implementation status: Phase 3 authentication and authorization foundation implemented and verified
 
 This repository is a learning implementation of a construction-industry project management SaaS. It is intended to make the work history described in the career material traceable from the browser through the API and ORM to PostgreSQL.
 
@@ -101,30 +101,42 @@ docker compose exec -T \
 
 Tests reject a missing/invalid test URL or a database name that does not end in `_test`; they never fall back to the development DB.
 
-Alembic shares backend settings. Phase 2 intentionally has no revision because there is no model metadata or business table yet:
+Alembic shares backend settings. Phase 3 adds the authentication-foundation revision:
 
 ```bash
 docker compose exec -T backend alembic upgrade head
 docker compose exec -T backend alembic current
 docker compose exec -T backend alembic check
+docker compose exec -T backend python -m app.db.seed
 ```
+
+The seed command is idempotent and uses the learning-only passwords from `.env`. Demo login IDs are `admin@example.com`, `manager@example.com`, `member@example.com`, and inactive `inactive@example.com`; their example passwords are documented only in `.env.example`. The login UI is at `http://localhost:3000/login`, and `/account` demonstrates protected-route, role-gate, and logout behavior.
+
+## Authentication security boundary
+
+Passwords are hashed with Argon2id. Login returns a random opaque token with an eight-hour lifetime; PostgreSQL stores only its SHA-256 hash. A partial unique index permits one unrevoked session per user; re-login revokes the previous row before creating the new session. Inactive users cannot log in or use an existing token.
+
+The frontend stores the raw Bearer token in localStorage only for this learning project. JavaScript running on the same origin can read localStorage, so an XSS vulnerability could steal the token. This is not presented as a production-grade session-storage design. Avoid unsafe HTML injection and do not place real credentials or tokens in repository files.
 
 `backend/Dockerfile` separates the development/test target from the production runtime target; pytest, Ruff, and the test HTTP client are absent from production. The frontend Dockerfile similarly separates dependency, development, build, and production stages. These are local image targets, not a production deployment design.
 
-## Phase 1 structure
+## Current structure
 
 ```text
 frontend/
   src/app/                  Next.js App Router layout, top page, 404, global CSS
   src/components/           app shell, common states/button, minimal form
+  src/auth/                 token storage, AuthProvider, guards and roles
   src/lib/api/              API client and shared error types
   src/providers/            TanStack Query provider
 backend/
   app/api/                  v1 router, health route, shared errors
   app/core/                 settings
   app/db/                   lazy SQLAlchemy engine/session and test DB guard
-  alembic/                  configured empty migration environment; no revision
-  tests/                    health, common errors, and test DB safety
+  app/auth/                 password/token service and authorization dependencies
+  app/models/               User, AuthTokenSession, and Assignee
+  alembic/                  Phase 3 authentication schema revision
+  tests/                    health, errors, DB safety, authentication, roles, seed
 ```
 
 ## Documentation
@@ -141,4 +153,4 @@ Detailed plans are available for screens, APIs, data, authorization, Gantt, Kanb
 
 ## Current boundary
 
-Phase 2 contains local Docker/PostgreSQL/SQLAlchemy/Alembic infrastructure only. It has no migration revision or business table, GitHub Actions workflow, authentication/authorization, business model, business API, audit history, Gantt, or Kanban implementation.
+Phase 3 contains authentication and authorization foundations only. It has no Customer, Property, Project, project assignment, business API, audit history, status service, Gantt, Kanban, GitHub Actions workflow, or production deployment.

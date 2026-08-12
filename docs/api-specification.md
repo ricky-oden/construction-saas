@@ -2,7 +2,7 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-The Phase 2 DB-backed health endpoint is implemented. All business endpoints remain planned and `NOT_IMPLEMENTED`; their detailed schemas remain to be finalized before implementation.
+The DB-backed health and Phase 3 authentication endpoints are implemented. All business endpoints remain planned and `NOT_IMPLEMENTED`.
 
 ## Common conventions
 
@@ -38,7 +38,9 @@ If PostgreSQL is unavailable, the endpoint returns HTTP 503 with code `DATABASE_
 | POST | `/api/v1/auth/logout` | Revoke current persisted token | AUTH-001 |
 | GET | `/api/v1/auth/me` | Return authenticated user, role, and assignee identity | AUTH-001, AUTH-002 |
 
-The raw opaque token is returned to the client, while its server-side representation is stored in PostgreSQL. Exact lifetime and concurrent-session policy are unresolved.
+All three endpoints are implemented and verified. Login accepts unique email/password credentials and returns the raw opaque token, `bearer` type, eight-hour expiration, and user identity. PostgreSQL stores only SHA-256 token hash. Logout and me require an active Bearer token. Re-login invalidates the previous token, and inactive users are rejected.
+
+Authentication failures use HTTP 401 and `AUTHENTICATION_REQUIRED` or `INVALID_CREDENTIALS`. An authenticated user failing a backend role dependency receives HTTP 403 and `FORBIDDEN`.
 
 ## Projects
 

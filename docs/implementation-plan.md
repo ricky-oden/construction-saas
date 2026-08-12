@@ -27,8 +27,8 @@ Build a learning-oriented construction project management SaaS that connects UI 
 |---|---|---|---|
 | 0 | Approve and freeze planning documents | All | Completed |
 | 1 | Scaffold frontend/backend and local quality commands | ENV, UI | Completed |
-| 2 | Docker Compose, PostgreSQL, Alembic, and DB-facing error integration | ENV, API, DATA | Implemented and verified; review pending |
-| 3 | Learning login, opaque token, users/assignees, authorization base | AUTH | Not implemented |
+| 2 | Docker Compose, PostgreSQL, Alembic, and DB-facing error integration | ENV, API, DATA | Completed |
+| 3 | Learning login, opaque token, users/assignees, authorization base | AUTH | Implemented and verified; review pending |
 | 4 | Customer, property, project list/detail/create/update vertical slice | DATA, PRJ | Not implemented |
 | 5 | Search, filtering, sorting, pagination, cache policy | SEARCH, CACHE | Not implemented |
 | 6 | Multiple assignees, status service, optimistic locking, audit history | STATUS, AUDIT | Not implemented |
@@ -76,12 +76,10 @@ A phase is complete only when its mapped acceptance criteria pass, planned autom
 ## Unresolved before relevant implementation
 
 - Exact status transition matrix and per-status member update permissions
-- Opaque token lifetime and session-limit policy
 - Exact domain field catalog and validation limits
 - Archive reactivation rules and referential behavior
 - Default sort, page size, and maximum page size
 - Date-overlap search semantics
 - Gantt visible-range defaults and week-start convention
 - Audit retention and whether reasons are mandatory for selected actions
-- Seed fixture contents (test database lifecycle is fixed for Phase 2)
 - Whether the career material's broader "process/progress" wording requires data beyond project status and project date range; process/task-level Gantt remains out of scope

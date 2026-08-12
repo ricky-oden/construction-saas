@@ -4,7 +4,7 @@ PLAN_VERSION: `CONSTRUCTION-V1.0`
 
 Requirement: TEST-001
 
-Status: `PARTIAL` — Phase 1/2 foundation coverage implemented; later business and browser coverage remains.
+Status: `PARTIAL` — Phase 1–3 foundation coverage implemented; later business and browser coverage remains.
 
 ## Principles
 
@@ -26,6 +26,8 @@ Phase 1 verified in jsdom:
 
 These are component tests; they do not launch a real browser or exercise a live backend.
 
+Phase 3 jsdom tests add token storage/restoration, Bearer attachment, 401 clearing, protected-route origin retention, role-gated display, login input retention, pending disabled text, validation, successful token storage, and logout.
+
 Later phases add:
 
 - Gantt date-range intersection, clipping, and pixel geometry pure functions
@@ -37,7 +39,7 @@ Later phases add:
 
 ## Backend: pytest
 
-Phase 2 verifies with in-process FastAPI TestClient and real PostgreSQL:
+Phase 2/3 verify with in-process FastAPI TestClient and real PostgreSQL:
 
 - DB-backed health success
 - Unified validation and 404 errors
@@ -54,10 +56,19 @@ Phase 2 additionally verifies:
 - stopped test DB failure without development DB fallback
 - safe DB error envelope without credentials, connection URL, or internal exception text
 
+Phase 3 additionally verifies:
+
+- Argon2id password representation and login success/failure
+- SHA-256-only token persistence and eight-hour expiration
+- re-login invalidation, logout, invalid/revoked/expired tokens, and inactive users
+- `/auth/me`, optional Assignee identity, and ADMIN/MANAGER/MEMBER dependencies
+- unified 401/403 behavior
+- migration upgrade/current/check and idempotent demo seed
+- real Next.js proxy login→me→logout over container TCP
+
 Later phases add:
 
-- Login, active/revoked/invalid opaque token behavior
-- ADMIN/MANAGER/MEMBER authorization and assigned-project scope
+- assigned-project and resource authorization
 - Customer/property/project cardinality and consistency
 - Customer, property, assignee, and project CRUD/archive behavior
 - Project search combinations, sorting, and pagination
@@ -115,7 +126,6 @@ GitHub Actions is not part of Phase 2 and no workflow exists. When separately ap
 
 ## Unresolved test setup
 
-- Fixture/seed identities and credentials
 - Browser matrix
 - Coverage thresholds
 

@@ -50,6 +50,18 @@ This log records the initial approved baseline and future approved changes. Init
 | DEC-030 | Route browser API traffic through Next.js at same-origin `/api/v1`; use `BACKEND_INTERNAL_URL=http://backend:8000` only within Compose and allow `http://localhost:8002` for non-Docker backend development. |
 | DEC-031 | Use Node.js 22.23.2 and Python 3.12.13 multi-stage Dockerfiles. Frontend and backend development/production targets run nonroot; backend production inherits runtime dependencies only. |
 
+## 2026-08-12 — Phase 3 implementation details
+
+| ID | Decision |
+|---|---|
+| DEC-032 | Use normalized unique email login IDs and Argon2id password hashes via argon2-cffi 25.1.0. Pin its bindings and CFFI runtime dependencies. |
+| DEC-033 | Generate opaque tokens with `secrets.token_urlsafe(32)`, return the raw value once, persist only its SHA-256 hash, and expire sessions after eight hours. |
+| DEC-034 | Use a partial unique index to allow at most one unrevoked AuthTokenSession per user. Re-login revokes the prior row and creates a new hashed session; logout sets `revoked_at`; inactive users cannot log in or authenticate. |
+| DEC-035 | Implement User roles `ADMIN`, `MANAGER`, and `MEMBER`, backend active-token and role dependencies, and stable `AUTHENTICATION_REQUIRED` 401 versus `FORBIDDEN` 403 errors. Resource/assignment authorization remains later-phase. |
+| DEC-036 | Model User to Assignee as optional one-to-one. Create no Project assignment or other business model in Phase 3. |
+| DEC-037 | Store the learning token in frontend localStorage, attach it as a Bearer credential, clear it on 401, restore via `/auth/me`, preserve the protected-route path, and document XSS exposure. |
+| DEC-038 | Provide an environment-driven, idempotent four-user demo seed with ADMIN, MANAGER, MEMBER, inactive, and assignee-linked cases. Values in `.env.example` are learning-only. |
+
 ## Change control
 
 After this baseline, a request that changes `CAREER-SYSTEMS-V1` or the approved `CONSTRUCTION-V1` plan must be recorded as `PROPOSED_CHANGE`, approved explicitly, and only then reflected here with a new plan version.

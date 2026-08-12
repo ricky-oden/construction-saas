@@ -40,7 +40,7 @@ Normal initial design within an unmodified approved scope is not a `PROPOSED_CHA
 
 ## Current implementation gate
 
-Phase 1 is committed and pushed. Phase 2 local Docker/PostgreSQL/SQLAlchemy/Alembic infrastructure is implemented and verified but remains uncommitted pending review. Phase 3 and later work remains gated. Authentication, business models/APIs/services, audit history, Gantt, Kanban, GitHub Actions, Phase 2 commits, and pushes require a later explicit instruction.
+Phases 1 and 2 are committed and pushed. Phase 3 authentication/authorization foundation is implemented and verified but remains uncommitted pending review. Phase 4 and later work remains gated. Customer/Property/Project models and APIs, project assignment, status services, audit history, Gantt, Kanban, GitHub Actions, Phase 3 commits, and pushes require a later explicit instruction.
 
 ## Quiz mode
 

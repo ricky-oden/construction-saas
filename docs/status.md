@@ -2,19 +2,19 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-Current phase: Phase 2 — local container and database foundation implemented and verified; review pending.
+Current phase: Phase 3 — authentication and authorization foundation implemented and verified; review pending.
 
 ## Product requirement status
 
-Phase 1 is complete and Phase 2 infrastructure is implemented. Requirements spanning later phases remain partial or not implemented. No migration revision or business table, authentication, business model/API, audit history, Gantt, Kanban, or CI workflow exists.
+Phases 1 and 2 are complete and Phase 3 authentication infrastructure is implemented. Requirements spanning later phases remain partial or not implemented. No Customer/Property/Project model or API, project assignment, audit history, Gantt, Kanban, or CI workflow exists.
 
 | Requirement group | Status | Verification |
 |---|---|---|
 | ENV | PARTIAL | Node/Python/PostgreSQL patches, lockfiles, dependency separation, Docker Compose, nonroot runtime, DB separation, and migration checks verified; CI remains Phase 9 |
 | UI | PARTIAL | Shared shell, states, button, and React Hook Form foundation verified; business usage remains later-phase |
 | API | PARTIAL | Common error envelope, DB error handler, DB-backed health, and same-origin proxy verified; business errors and 409 metadata remain later-phase |
-| AUTH | NOT_IMPLEMENTED | Not run |
-| DATA | PARTIAL | SQLAlchemy engine/session/get_db and PostgreSQL connectivity verified; business models and constraints are not implemented |
+| AUTH | PARTIAL | Login/logout/me, Argon2id, hashed opaque sessions, expiry, inactive-user checks, three roles, backend role dependency, and frontend auth foundation verified; resource authorization remains later-phase |
+| DATA | PARTIAL | SQLAlchemy infrastructure and User/AuthTokenSession/optional Assignee relationship verified; Customer/Property/Project and project assignment are not implemented |
 | PRJ | NOT_IMPLEMENTED | Not run |
 | SEARCH | NOT_IMPLEMENTED | Not run |
 | STATUS | NOT_IMPLEMENTED | Not run |
@@ -23,7 +23,7 @@ Phase 1 is complete and Phase 2 infrastructure is implemented. Requirements span
 | CACHE | NOT_IMPLEMENTED | Not run |
 | AUDIT | NOT_IMPLEMENTED | Not run |
 | ARCH | NOT_IMPLEMENTED | Not run |
-| TEST | PARTIAL | 9 frontend jsdom tests and 11 backend tests passed, including real PostgreSQL/test-DB guard cases; browser and business suites remain later-phase |
+| TEST | PARTIAL | 18 frontend jsdom tests and 23 backend PostgreSQL tests passed; real-browser and business suites remain later-phase |
 
 ## Documentation status
 
@@ -56,7 +56,18 @@ Phase 1 is complete and Phase 2 infrastructure is implemented. Requirements span
 
 ## Prohibited until explicit follow-up approval
 
-- Authentication, authorization, business models/APIs, audit history, Gantt, or Kanban
-- A business-table migration revision
+- Customer, Property, Project, project assignment, business APIs, status, audit, Gantt, or Kanban
 - GitHub Actions
-- Phase 2 commit, push, pull request, or deployment
+- Phase 3 commit, push, pull request, or deployment
+
+## Phase 3 verification — 2026-08-12
+
+- Argon2id password hashes and eight-hour opaque-token sessions passed against PostgreSQL 16.14.
+- Only SHA-256 token hashes are persisted; raw tokens exist only in the login response and frontend localStorage.
+- Re-login invalidates the old token, logout revokes the current token, and invalid/revoked/expired/inactive-user tokens return the unified 401 envelope.
+- `/auth/me` and backend ADMIN/MANAGER/MEMBER role dependencies distinguish 401 from 403.
+- User and Assignee use an optional one-to-one relationship; Project assignment remains unimplemented.
+- The four-user demo seed, including inactive and assignee-linked identities, remained at four users/two assignees after two runs.
+- Next.js same-origin login→me→logout was verified over real container TCP.
+- 18 frontend tests and 23 backend tests passed; lint, format, typecheck, build, migration upgrade/current/check passed.
+- Frontend tests use jsdom rather than a real browser; Playwright remains unimplemented.

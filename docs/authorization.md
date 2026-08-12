@@ -2,11 +2,11 @@
 
 PLAN_VERSION: `CONSTRUCTION-V1.0`
 
-All authentication and authorization behavior is `NOT_IMPLEMENTED`.
+Phase 3 authentication and role-foundation behavior is implemented and verified. Project/resource authorization remains later-phase work.
 
 ## Authentication flow
 
-1. User submits learning credentials to `POST /api/auth/login`.
+1. User submits email credentials to `POST /api/v1/auth/login`.
 2. Backend validates the persisted user credentials.
 3. Backend generates an opaque token and persists the token session in PostgreSQL.
 4. Frontend stores the returned token in localStorage.
@@ -14,7 +14,7 @@ All authentication and authorization behavior is `NOT_IMPLEMENTED`.
 6. Backend resolves an active token to its user for every protected request.
 7. Logout revokes the persisted token session.
 
-The token contains no client-readable identity or role claims. Exact token lifetime, rotation, and concurrent-session limits are unresolved.
+The token contains no client-readable identity or role claims. It is generated with `secrets.token_urlsafe(32)`, expires after eight hours, and only its SHA-256 hash is stored. One session row exists per user; re-login replaces it and invalidates the prior raw token. Logout records `revoked_at`. Passwords use Argon2id, and inactive users fail both login and authenticated API access.
 
 ## localStorage security note
 
@@ -44,6 +44,8 @@ valid active token
 ```
 
 The backend is authoritative. Frontend route guards and hidden/disabled controls provide understandable UX but are not a security boundary.
+
+Phase 3 provides `require_roles(...)` for endpoint-level role checks. Missing/invalid authentication returns `AUTHENTICATION_REQUIRED` with 401; an authenticated user lacking the required role receives `FORBIDDEN` with 403. Assignment, resource, project status, and version checks remain unimplemented until their approved phases.
 
 ## Status service boundary
 
