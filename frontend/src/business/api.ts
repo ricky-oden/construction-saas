@@ -33,6 +33,27 @@ export const businessApi = {
   assignees: () => apiRequest<{ items: Assignee[] }>("/assignees"),
   history: (id: number) =>
     apiRequest<{ items: AuditLog[] }>(`/projects/${id}/history`),
+  ganttProjects: async (periodFrom: string, periodTo: string) => {
+    const items: Project[] = [];
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const response = await apiRequest<ListResponse<Project>>(
+        listPath("/projects", {
+          period_from: periodFrom,
+          period_to: periodTo,
+          sort: "start_date",
+          order: "asc",
+          page,
+          page_size: 100,
+        }),
+      );
+      items.push(...response.items);
+      totalPages = response.total_pages;
+      page += 1;
+    } while (page <= totalPages);
+    return items;
+  },
 };
 
 export function writeBusiness<T>(

@@ -54,6 +54,7 @@ export function ProjectWorkflow({ project }: Readonly<{ project: Project }>) {
   const reconcile = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: businessKeys.projects.all }),
+      queryClient.invalidateQueries({ queryKey: businessKeys.gantt.all }),
       queryClient.invalidateQueries({
         queryKey: businessKeys.history.detail(project.id),
       }),

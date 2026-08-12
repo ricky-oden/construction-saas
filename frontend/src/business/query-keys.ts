@@ -36,4 +36,9 @@ export const businessKeys = {
     detail: (projectId: number) =>
       [...businessKeys.history.all, projectId] as const,
   },
+  gantt: {
+    all: ["gantt"] as const,
+    range: (periodFrom: string, periodTo: string) =>
+      [...businessKeys.gantt.all, { periodFrom, periodTo }] as const,
+  },
 };

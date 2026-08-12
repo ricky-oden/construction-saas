@@ -65,6 +65,7 @@ export function ProjectForm({
       await queryClient.invalidateQueries({
         queryKey: businessKeys.projects.lists(),
       });
+      await queryClient.invalidateQueries({ queryKey: businessKeys.gantt.all });
       onSaved(saved);
     },
   });
@@ -84,6 +85,9 @@ export function ProjectForm({
         );
         await queryClient.invalidateQueries({
           queryKey: businessKeys.projects.all,
+        });
+        await queryClient.invalidateQueries({
+          queryKey: businessKeys.gantt.all,
         });
       } else {
         setApiError(formErrorMessage(error));
