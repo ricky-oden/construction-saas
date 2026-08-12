@@ -5,12 +5,14 @@ import Link from "next/link";
 
 import { ManagementRoute } from "@/auth/management-route";
 import { businessApi } from "@/business/api";
+import { businessKeys } from "@/business/query-keys";
 import { AsyncState } from "@/components/ui/async-state";
 
 export default function CustomersPage() {
+  const params = { page: 1, page_size: 20 };
   const query = useQuery({
-    queryKey: ["customers"],
-    queryFn: businessApi.customers,
+    queryKey: businessKeys.customers.list(params),
+    queryFn: () => businessApi.customers(params),
   });
   return (
     <ManagementRoute>

@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { ManagementRoute } from "@/auth/management-route";
 import { businessApi } from "@/business/api";
+import { businessKeys } from "@/business/query-keys";
 import { CustomerForm } from "@/components/business/customer-form";
 import { AsyncState } from "@/components/ui/async-state";
 
@@ -13,7 +14,7 @@ export default function CustomerDetailPage() {
   const id = Number(useParams<{ customerId: string }>().customerId);
   const [saved, setSaved] = useState(false);
   const query = useQuery({
-    queryKey: ["customers", id],
+    queryKey: businessKeys.customers.detail(id),
     queryFn: () => businessApi.customer(id),
   });
   return (

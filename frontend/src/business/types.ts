@@ -26,6 +26,26 @@ export type Property = {
 export type ProjectStatus =
   "DRAFT" | "PLANNED" | "IN_PROGRESS" | "ON_HOLD" | "COMPLETED" | "CANCELLED";
 
+export type SortOrder = "asc" | "desc";
+export type ProjectSort =
+  "code" | "name" | "start_date" | "end_date" | "created_at" | "updated_at";
+
+export type PaginationParams = {
+  page: number;
+  page_size: number;
+};
+
+export type ProjectSearchParams = PaginationParams & {
+  name: string;
+  status: ProjectStatus | "";
+  customer_id: number | null;
+  property_id: number | null;
+  period_from: string;
+  period_to: string;
+  sort: ProjectSort;
+  order: SortOrder;
+};
+
 export type Project = {
   id: number;
   code: string;
@@ -42,4 +62,10 @@ export type Project = {
   updated_at: string;
 };
 
-export type ListResponse<T> = { items: T[] };
+export type ListResponse<T> = {
+  items: T[];
+  page: number;
+  page_size: number;
+  total: number;
+  total_pages: number;
+};

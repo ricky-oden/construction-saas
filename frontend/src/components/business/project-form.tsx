@@ -6,6 +6,7 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { businessApi, writeBusiness } from "@/business/api";
 import { formErrorMessage } from "@/business/form-error";
+import { businessKeys, referenceListParams } from "@/business/query-keys";
 import type { Project } from "@/business/types";
 import { Button } from "@/components/ui/button";
 
@@ -25,12 +26,12 @@ export function ProjectForm({
   onSaved,
 }: Readonly<{ project?: Project; onSaved: (project: Project) => void }>) {
   const customers = useQuery({
-    queryKey: ["customers"],
-    queryFn: businessApi.customers,
+    queryKey: businessKeys.customers.list(referenceListParams),
+    queryFn: () => businessApi.customers(referenceListParams),
   });
   const properties = useQuery({
-    queryKey: ["properties"],
-    queryFn: businessApi.properties,
+    queryKey: businessKeys.properties.list(referenceListParams),
+    queryFn: () => businessApi.properties(referenceListParams),
   });
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
@@ -61,7 +62,10 @@ export function ProjectForm({
         project ? values : { ...values, is_archived: undefined },
       ),
     onSuccess: async (saved) => {
-      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.setQueryData(businessKeys.projects.detail(saved.id), saved);
+      await queryClient.invalidateQueries({
+        queryKey: businessKeys.projects.lists(),
+      });
       onSaved(saved);
     },
   });

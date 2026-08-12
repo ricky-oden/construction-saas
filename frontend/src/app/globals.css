@@ -29,6 +29,32 @@
   gap: 1rem;
 }
 
+.search-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.search-grid label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.search-actions,
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search-actions {
+  align-self: end;
+}
+
+.pagination {
+  justify-content: center;
+}
+
 .form-stack label {
   display: grid;
   gap: 0.4rem;
@@ -268,5 +294,9 @@ input {
 
   .app-content {
     padding-block-start: 1rem;
+  }
+
+  .search-grid {
+    grid-template-columns: 1fr;
   }
 }

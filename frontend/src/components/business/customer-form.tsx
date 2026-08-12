@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import type { Customer } from "@/business/types";
 import { formErrorMessage } from "@/business/form-error";
 import { writeBusiness } from "@/business/api";
+import { businessKeys } from "@/business/query-keys";
 import { Button } from "@/components/ui/button";
 
 type CustomerFields = {
@@ -42,7 +43,10 @@ export function CustomerForm({
         values,
       ),
     onSuccess: async (saved) => {
-      await queryClient.invalidateQueries({ queryKey: ["customers"] });
+      queryClient.setQueryData(businessKeys.customers.detail(saved.id), saved);
+      await queryClient.invalidateQueries({
+        queryKey: businessKeys.customers.lists(),
+      });
       onSaved(saved);
     },
   });

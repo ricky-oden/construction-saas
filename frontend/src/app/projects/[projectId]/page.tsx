@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { ManagementRoute } from "@/auth/management-route";
 import { businessApi } from "@/business/api";
+import { businessKeys } from "@/business/query-keys";
 import { ProjectForm } from "@/components/business/project-form";
 import { AsyncState } from "@/components/ui/async-state";
 
@@ -13,7 +14,7 @@ export default function ProjectDetailPage() {
   const id = Number(useParams<{ projectId: string }>().projectId);
   const [saved, setSaved] = useState(false);
   const query = useQuery({
-    queryKey: ["projects", id],
+    queryKey: businessKeys.projects.detail(id),
     queryFn: () => businessApi.project(id),
   });
   return (

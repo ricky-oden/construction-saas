@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { ManagementRoute } from "@/auth/management-route";
 import { businessApi } from "@/business/api";
+import { businessKeys } from "@/business/query-keys";
 import { PropertyForm } from "@/components/business/property-form";
 import { AsyncState } from "@/components/ui/async-state";
 
@@ -13,7 +14,7 @@ export default function PropertyDetailPage() {
   const id = Number(useParams<{ propertyId: string }>().propertyId);
   const [saved, setSaved] = useState(false);
   const query = useQuery({
-    queryKey: ["properties", id],
+    queryKey: businessKeys.properties.detail(id),
     queryFn: () => businessApi.property(id),
   });
   return (

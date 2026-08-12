@@ -5,12 +5,14 @@ import Link from "next/link";
 
 import { ManagementRoute } from "@/auth/management-route";
 import { businessApi } from "@/business/api";
+import { businessKeys } from "@/business/query-keys";
 import { AsyncState } from "@/components/ui/async-state";
 
 export default function PropertiesPage() {
+  const params = { page: 1, page_size: 20 };
   const query = useQuery({
-    queryKey: ["properties"],
-    queryFn: businessApi.properties,
+    queryKey: businessKeys.properties.list(params),
+    queryFn: () => businessApi.properties(params),
   });
   return (
     <ManagementRoute>

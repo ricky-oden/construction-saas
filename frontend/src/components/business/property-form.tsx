@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 
 import { businessApi, writeBusiness } from "@/business/api";
 import { formErrorMessage } from "@/business/form-error";
+import { businessKeys, referenceListParams } from "@/business/query-keys";
 import type { Property } from "@/business/types";
 import { Button } from "@/components/ui/button";
 
@@ -24,8 +25,8 @@ export function PropertyForm({
   onSaved,
 }: Readonly<{ property?: Property; onSaved: (property: Property) => void }>) {
   const customers = useQuery({
-    queryKey: ["customers"],
-    queryFn: businessApi.customers,
+    queryKey: businessKeys.customers.list(referenceListParams),
+    queryFn: () => businessApi.customers(referenceListParams),
   });
   const queryClient = useQueryClient();
   const [apiError, setApiError] = useState<string | null>(null);
@@ -50,7 +51,10 @@ export function PropertyForm({
       );
     },
     onSuccess: async (saved) => {
-      await queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.setQueryData(businessKeys.properties.detail(saved.id), saved);
+      await queryClient.invalidateQueries({
+        queryKey: businessKeys.properties.lists(),
+      });
       onSaved(saved);
     },
   });
